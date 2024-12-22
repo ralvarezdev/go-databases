@@ -60,3 +60,32 @@ func PrepareUpdateOptions(upsert bool) *options.UpdateOptions {
 
 	return updateOptions
 }
+
+// PrepareFindOneAndUpdateOptions prepares the find one and update options
+func PrepareFindOneAndUpdateOptions(
+	projection interface{},
+	sort interface{},
+	upsert bool,
+	returnDocument options.ReturnDocument,
+) *options.FindOneAndUpdateOptions {
+	// Create the find one and update options
+	findOneAndUpdateOptions := options.FindOneAndUpdate()
+
+	// Set the projection
+	if projection != nil {
+		findOneAndUpdateOptions.SetProjection(projection)
+	}
+
+	// Set the sort
+	if sort != nil {
+		findOneAndUpdateOptions.SetSort(sort)
+	}
+
+	// Set the upsert
+	findOneAndUpdateOptions.SetUpsert(upsert)
+
+	// Set the return document
+	findOneAndUpdateOptions.SetReturnDocument(returnDocument)
+
+	return findOneAndUpdateOptions
+}
