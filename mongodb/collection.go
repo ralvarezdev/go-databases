@@ -52,7 +52,7 @@ func (c *Collection) createIndexes(collection *mongo.Collection) (err error) {
 				context.Background(), *index,
 			)
 			if err != nil {
-				return fmt.Errorf(FailedToCreateIndexError, *index)
+				return fmt.Errorf(FailedToCreateIndexError, *index, err)
 			}
 		}
 	}
