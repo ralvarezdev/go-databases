@@ -29,10 +29,13 @@ type (
 )
 
 // NewDefaultConnectionHandler creates a new connection
-func NewDefaultConnectionHandler(config *Config) (*DefaultConnectionHandler, error) {
+func NewDefaultConnectionHandler(config *Config) (
+	*DefaultConnectionHandler,
+	error,
+) {
 	// Check if the config is nil
 	if config == nil {
-		return nil, NilConfigError
+		return nil, ErrNilConfig
 	}
 
 	// Define the Redis options
@@ -52,7 +55,7 @@ func NewDefaultConnectionHandler(config *Config) (*DefaultConnectionHandler, err
 func (d *DefaultConnectionHandler) Connect() (*redis.Client, error) {
 	// Check if the connection is already established
 	if d.Client != nil {
-		return d.Client, godatabases.AlreadyConnectedError
+		return d.Client, godatabases.ErrAlreadyConnected
 	}
 
 	// Create a new Redis client
@@ -61,7 +64,7 @@ func (d *DefaultConnectionHandler) Connect() (*redis.Client, error) {
 	// Ping the Redis server to check the connection
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
-		return nil, godatabases.FailedToPingError
+		return nil, godatabases.ErrPingFailed
 	}
 
 	// Set client
@@ -74,7 +77,7 @@ func (d *DefaultConnectionHandler) Connect() (*redis.Client, error) {
 func (d *DefaultConnectionHandler) GetClient() (*redis.Client, error) {
 	// Check if the connection is established
 	if d.Client == nil {
-		return nil, godatabases.NotConnectedError
+		return nil, godatabases.ErrNotConnected
 	}
 
 	return d.Client, nil
@@ -90,7 +93,7 @@ func (d *DefaultConnectionHandler) Disconnect() {
 
 		// Close the connection
 		if err := d.Client.Close(); err != nil {
-			panic(godatabases.FailedToDisconnectError)
+			panic(godatabases.ErrFailedToDisconnect)
 		}
 	}()
 }

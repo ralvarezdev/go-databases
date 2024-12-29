@@ -5,6 +5,6 @@ import (
 )
 
 var (
-	NilClientError = errors.New("redis client cannot be nil")
-	NilConfigError = errors.New("redis config cannot be nil")
+	ErrNilClient = errors.New("redis client cannot be nil")
+	ErrNilConfig = errors.New("redis config cannot be nil")
 )

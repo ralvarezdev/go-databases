@@ -17,14 +17,17 @@ func CreateTransactionOptions() *options.TransactionOptions {
 func CreateSession(client *mongo.Client) (mongo.Session, error) {
 	// Check if the client is nil
 	if client == nil {
-		return nil, NilClientError
+		return nil, ErrNilClient
 	}
 
 	return client.StartSession()
 }
 
 // CreateTransaction creates a new transaction
-func CreateTransaction(client *mongo.Client, queries func(sc mongo.SessionContext) error) error {
+func CreateTransaction(
+	client *mongo.Client,
+	queries func(sc mongo.SessionContext) error,
+) error {
 	// Create the session
 	clientSession, err := CreateSession(client)
 	if err != nil {
@@ -37,7 +40,9 @@ func CreateTransaction(client *mongo.Client, queries func(sc mongo.SessionContex
 
 	// Start the transaction
 	err = mongo.WithSession(
-		context.Background(), clientSession, func(sc mongo.SessionContext) error {
+		context.Background(),
+		clientSession,
+		func(sc mongo.SessionContext) error {
 			if err = clientSession.StartTransaction(transactionOptions); err != nil {
 				return err
 			}

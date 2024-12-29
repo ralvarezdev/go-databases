@@ -3,9 +3,9 @@ package go_databases
 import "errors"
 
 var (
-	AlreadyConnectedError   = errors.New("connection to database already established")
-	FailedToConnectError    = errors.New("failed to connect to database")
-	FailedToPingError       = errors.New("failed to ping database")
-	NotConnectedError       = errors.New("connection to database not established")
-	FailedToDisconnectError = errors.New("failed to disconnect from database")
+	ErrAlreadyConnected   = errors.New("connection to database already established")
+	ErrConnectionFailed   = errors.New("failed to connect to database")
+	ErrPingFailed         = errors.New("failed to ping database")
+	ErrNotConnected       = errors.New("connection to database not established")
+	ErrFailedToDisconnect = errors.New("failed to disconnect from database")
 )

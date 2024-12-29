@@ -32,10 +32,13 @@ type (
 )
 
 // NewDefaultConnectionHandler creates a new connection
-func NewDefaultConnectionHandler(config *Config) (*DefaultConnectionHandler, error) {
+func NewDefaultConnectionHandler(config *Config) (
+	*DefaultConnectionHandler,
+	error,
+) {
 	// Check if the config is nil
 	if config == nil {
-		return nil, NilClientError
+		return nil, ErrNilClient
 	}
 
 	// Set client options
@@ -54,7 +57,7 @@ func NewDefaultConnectionHandler(config *Config) (*DefaultConnectionHandler, err
 func (d *DefaultConnectionHandler) Connect() (*mongo.Client, error) {
 	// Check if the connection is already established
 	if d.Client != nil {
-		return d.Client, godatabases.AlreadyConnectedError
+		return d.Client, godatabases.ErrAlreadyConnected
 	}
 
 	// Connect to MongoDB
@@ -62,13 +65,13 @@ func (d *DefaultConnectionHandler) Connect() (*mongo.Client, error) {
 
 	// Create MongoDB Connection struct
 	if err != nil {
-		return nil, godatabases.FailedToConnectError
+		return nil, godatabases.ErrConnectionFailed
 	}
 
 	// Check the connection
 	err = client.Ping(context.Background(), nil)
 	if err != nil {
-		return nil, godatabases.FailedToPingError
+		return nil, godatabases.ErrPingFailed
 	}
 
 	// Set client
@@ -81,7 +84,7 @@ func (d *DefaultConnectionHandler) Connect() (*mongo.Client, error) {
 func (d *DefaultConnectionHandler) GetClient() (*mongo.Client, error) {
 	// Check if the connection is established
 	if d.Client == nil {
-		return nil, godatabases.NotConnectedError
+		return nil, godatabases.ErrNotConnected
 	}
 
 	return d.Client, nil
@@ -98,7 +101,7 @@ func (d *DefaultConnectionHandler) Disconnect() {
 		// Close the connection
 		d.Cancel()
 		if err := d.Client.Disconnect(d.Ctx); err != nil {
-			panic(godatabases.FailedToDisconnectError)
+			panic(godatabases.ErrFailedToDisconnect)
 		}
 	}()
 }
