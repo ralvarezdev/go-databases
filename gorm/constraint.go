@@ -21,6 +21,20 @@ func NewConstraint(model interface{}, field string) *Constraint {
 	}
 }
 
+// HasConstraint checks if a constraint exists
+func HasConstraint(database *gorm.DB, constraint *Constraint) bool {
+	// Check if the database or the constraint is nil
+	if database == nil || constraint == nil {
+		return false
+	}
+
+	// Check if the constraint exists
+	return database.Migrator().HasConstraint(
+		constraint.model,
+		constraint.field,
+	)
+}
+
 // CreateConstraint creates a new constraint
 func CreateConstraint(database *gorm.DB, constraint *Constraint) error {
 	// Check if the database or the constraint is nil
@@ -29,6 +43,11 @@ func CreateConstraint(database *gorm.DB, constraint *Constraint) error {
 	}
 	if constraint == nil {
 		return ErrNilConstraint
+	}
+
+	// Check if the constraint exists
+	if HasConstraint(database, constraint) {
+		return nil
 	}
 
 	// Create the constraint
