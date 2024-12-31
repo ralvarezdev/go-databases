@@ -6,61 +6,75 @@ import (
 )
 
 type (
-	// Constraint struct
-	Constraint struct {
+	// ModelConstraints struct
+	ModelConstraints struct {
 		model interface{}
-		field string
+		names []string
 	}
 )
 
-// NewConstraint creates a new constraint
-func NewConstraint(model interface{}, field string) *Constraint {
-	return &Constraint{
+// NewModelConstraints creates a new model constraints
+func NewModelConstraints(model interface{}, names ...string) *ModelConstraints {
+	return &ModelConstraints{
 		model: model,
-		field: field,
+		names: names,
 	}
 }
 
 // HasConstraint checks if a constraint exists
-func HasConstraint(database *gorm.DB, constraint *Constraint) bool {
-	// Check if the database or the constraint is nil
-	if database == nil || constraint == nil {
+func HasConstraint(database *gorm.DB, model interface{}, name string) bool {
+	// Check if the database or the model is nil
+	if database == nil || model == nil {
 		return false
 	}
 
 	// Check if the constraint exists
 	return database.Migrator().HasConstraint(
-		constraint.model,
-		constraint.field,
+		model,
+		name,
 	)
 }
 
-// CreateConstraint creates a new constraint
-func CreateConstraint(database *gorm.DB, constraint *Constraint) error {
+// CreateModelConstraints creates model constraints
+func CreateModelConstraints(
+	database *gorm.DB,
+	modelConstraints *ModelConstraints,
+) (err error) {
 	// Check if the database or the constraint is nil
 	if database == nil {
 		return godatabases.ErrNilDatabase
 	}
-	if constraint == nil {
-		return ErrNilConstraint
+	if modelConstraints == nil {
+		return ErrNilModelConstraints
 	}
 
-	// Check if the constraint exists
-	if HasConstraint(database, constraint) {
-		return nil
-	}
+	for _, name := range modelConstraints.names {
+		// Check if the constraint exists
+		if HasConstraint(database, modelConstraints.model, name) {
+			return nil
+		}
 
-	// Create the constraint
-	return database.Migrator().CreateConstraint(
-		constraint.model,
-		constraint.field,
-	)
+		// Create the constraint
+		if err = database.Migrator().CreateConstraint(
+			modelConstraints.model,
+			name,
+		); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-// CreateConstraints creates new constraints
-func CreateConstraints(database *gorm.DB, constraints []*Constraint) error {
-	for _, constraint := range constraints {
-		if err := CreateConstraint(database, constraint); err != nil {
+// CreateModelsConstraints creates models constraints
+func CreateModelsConstraints(
+	database *gorm.DB,
+	modelsConstraints []*ModelConstraints,
+) error {
+	for _, modelConstraint := range modelsConstraints {
+		if err := CreateModelConstraints(
+			database,
+			modelConstraint,
+		); err != nil {
 			return err
 		}
 	}
