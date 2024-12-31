@@ -14,7 +14,7 @@ type Logger struct {
 func NewLogger(logger gologger.Logger) (*Logger, error) {
 	// Check if the logger is nil
 	if logger == nil {
-		return nil, gologger.NilLoggerError
+		return nil, gologger.ErrNilLogger
 	}
 
 	return &Logger{logger: logger}, nil
@@ -22,10 +22,22 @@ func NewLogger(logger gologger.Logger) (*Logger, error) {
 
 // ConnectedToDatabase logs a success message when the server connects to the database
 func (l *Logger) ConnectedToDatabase() {
-	l.logger.LogMessage(gologger.NewLogMessage("connected to database", gologgerstatus.StatusDebug, nil))
+	l.logger.LogMessage(
+		gologger.NewLogMessage(
+			"connected to database",
+			gologgerstatus.StatusDebug,
+			nil,
+		),
+	)
 }
 
 // DisconnectedFromDatabase logs a success message when the server disconnects from the database
 func (l *Logger) DisconnectedFromDatabase() {
-	l.logger.LogMessage(gologger.NewLogMessage("disconnected from database", gologgerstatus.StatusDebug, nil))
+	l.logger.LogMessage(
+		gologger.NewLogMessage(
+			"disconnected from database",
+			gologgerstatus.StatusDebug,
+			nil,
+		),
+	)
 }
