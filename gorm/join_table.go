@@ -27,7 +27,7 @@ func NewJoinField(
 	}
 }
 
-// SetupJoinTable setups the join table between two models
+// SetupJoinTable setups the join table
 func SetupJoinTable(
 	database *gorm.DB,
 	joinField *JoinField,
@@ -47,17 +47,13 @@ func SetupJoinTable(
 	)
 }
 
-// SetupJoinTables setups the join tables between multiple models
+// SetupJoinTables setups the join tables
 func SetupJoinTables(
 	database *gorm.DB,
 	joinFields []*JoinField,
-) error {
+) (err error) {
 	for _, joinField := range joinFields {
-		err := SetupJoinTable(
-			database,
-			joinField,
-		)
-		if err != nil {
+		if err = SetupJoinTable(database, joinField); err != nil {
 			return err
 		}
 	}
