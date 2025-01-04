@@ -25,8 +25,7 @@ func (l *Logger) ConnectedToDatabase() {
 	l.logger.LogMessage(
 		gologger.NewLogMessage(
 			"connected to database",
-			gologgerstatus.StatusDebug,
-			nil,
+			gologgerstatus.Debug,
 		),
 	)
 }
@@ -36,8 +35,7 @@ func (l *Logger) DisconnectedFromDatabase() {
 	l.logger.LogMessage(
 		gologger.NewLogMessage(
 			"disconnected from database",
-			gologgerstatus.StatusDebug,
-			nil,
+			gologgerstatus.Debug,
 		),
 	)
 }
