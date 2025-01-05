@@ -2,40 +2,38 @@ package go_databases
 
 import (
 	gologger "github.com/ralvarezdev/go-logger"
-	gologgerstatus "github.com/ralvarezdev/go-logger/status"
+	gologgermode "github.com/ralvarezdev/go-logger/mode"
+	gologgermodenamed "github.com/ralvarezdev/go-logger/mode/named"
 )
 
 // Logger is the logger for the database connection
 type Logger struct {
-	logger gologger.Logger
+	logger gologgermodenamed.Logger
 }
 
 // NewLogger is the logger for the database connection
-func NewLogger(logger gologger.Logger) (*Logger, error) {
+func NewLogger(header string, modeLogger gologgermode.Logger) (*Logger, error) {
 	// Check if the logger is nil
-	if logger == nil {
+	if modeLogger == nil {
 		return nil, gologger.ErrNilLogger
 	}
 
-	return &Logger{logger: logger}, nil
+	// Initialize the mode named logger
+	namedLogger, _ := gologgermodenamed.NewDefaultLogger(header, modeLogger)
+
+	return &Logger{logger: namedLogger}, nil
 }
 
 // ConnectedToDatabase logs a success message when the server connects to the database
 func (l *Logger) ConnectedToDatabase() {
-	l.logger.LogMessage(
-		gologger.NewLogMessage(
-			"connected to database",
-			gologgerstatus.Debug,
-		),
+	l.logger.Debug(
+		"connected to database",
 	)
 }
 
 // DisconnectedFromDatabase logs a success message when the server disconnects from the database
 func (l *Logger) DisconnectedFromDatabase() {
-	l.logger.LogMessage(
-		gologger.NewLogMessage(
-			"disconnected from database",
-			gologgerstatus.Debug,
-		),
+	l.logger.Debug(
+		"disconnected from database",
 	)
 }
