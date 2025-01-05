@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/ralvarezdev/go-logger v0.4.3
+	github.com/ralvarezdev/go-logger v0.4.4
 	go.mongodb.org/mongo-driver v1.17.1
 	golang.org/x/net v0.33.0
 	gorm.io/gorm v1.25.12
