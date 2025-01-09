@@ -8,18 +8,17 @@ import (
 type (
 	// Config struct
 	Config struct {
-		DB                    *sql.DB
-		MaxOpenConnections    *int
-		MaxIdleConnections    *int
-		ConnectionMaxLifetime *time.Duration
+		MaxOpenConnections    int
+		MaxIdleConnections    int
+		ConnectionMaxLifetime time.Duration
 	}
 )
 
 // NewConfig creates a new configuration
 func NewConfig(
-	maxOpenConnections *int,
-	maxIdleConnections *int,
-	connectionMaxLifetime *time.Duration,
+	maxOpenConnections int,
+	maxIdleConnections int,
+	connectionMaxLifetime time.Duration,
 ) *Config {
 	return &Config{
 		MaxOpenConnections:    maxOpenConnections,
@@ -45,19 +44,14 @@ func Connect(
 	}
 
 	// Set the maximum open connections
-	if config.MaxOpenConnections != nil {
-		db.SetMaxOpenConns(*config.MaxOpenConnections)
-	}
+	db.SetMaxOpenConns(config.MaxOpenConnections)
 
 	// Set the maximum idle connections
-	if config.MaxIdleConnections != nil {
-		db.SetMaxIdleConns(*config.MaxIdleConnections)
-	}
+	db.SetMaxIdleConns(config.MaxIdleConnections)
 
 	// Set the connection max lifetime
-	if config.ConnectionMaxLifetime != nil {
-		db.SetConnMaxLifetime(*config.ConnectionMaxLifetime)
-	}
+	db.SetConnMaxLifetime(config.ConnectionMaxLifetime)
+
 	return db, nil
 }
 
