@@ -9,7 +9,7 @@ import (
 func IsUniqueViolationError(err error) (bool, string) {
 	var pqErr *pgconn.PgError
 	if errors.As(err, &pqErr) && pqErr.Code == UniqueViolationCode {
-		return true, pqErr.ColumnName
+		return true, pqErr.ConstraintName
 	}
 	return false, ""
 }
