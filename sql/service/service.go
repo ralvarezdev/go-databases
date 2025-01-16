@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	godatabases "github.com/ralvarezdev/go-databases"
 	godatabasessql "github.com/ralvarezdev/go-databases/sql"
-	godatabasessqltransaction "github.com/ralvarezdev/go-databases/sql/transaction"
 	"strings"
 )
 
