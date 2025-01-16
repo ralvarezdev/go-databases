@@ -19,8 +19,7 @@ func CreateTransaction(db *sql.DB, fn func(tx *sql.Tx) error) error {
 	}
 
 	// Execute the transaction function
-	fnErr := fn(tx)
-	if fnErr != nil {
+	if fnErr := fn(tx); fnErr != nil {
 		err = tx.Rollback()
 		if err != nil {
 			return err

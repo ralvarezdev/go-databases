@@ -1,9 +1,11 @@
 package service
 
 import (
+	"context"
 	"database/sql"
 	godatabases "github.com/ralvarezdev/go-databases"
 	godatabasessql "github.com/ralvarezdev/go-databases/sql"
+	godatabasessqltransaction "github.com/ralvarezdev/go-databases/sql/transaction"
 	"strings"
 )
 
@@ -34,7 +36,7 @@ func NewDefaultService(db *sql.DB) (
 		return nil, godatabases.ErrNilDatabase
 	}
 
-	// Create the instance
+	// CreateTransaction the instance
 	instance = &DefaultService{
 		db: db,
 	}
@@ -68,6 +70,13 @@ func (d *DefaultService) Migrate(queries ...string) error {
 // RunTransaction runs a transaction
 func (d *DefaultService) RunTransaction(fn func(tx *sql.Tx) error) error {
 	return godatabasessql.CreateTransaction(d.db, fn)
+}
+
+// RunQueriesConcurrently runs queries concurrently
+func (d *DefaultService) RunQueriesConcurrently(
+	queries ...func(db *sql.DB, ctx context.Context) error,
+) *[]error {
+	return godatabasessql.RunQueriesConcurrently(d.db, queries...)
 }
 
 // Exec executes a query with parameters and returns the result

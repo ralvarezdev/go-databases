@@ -49,6 +49,8 @@ func Connect(
 	// Set the maximum idle connections
 	db.SetMaxIdleConns(config.MaxIdleConnections)
 
+	db.Set
+
 	// Set the connection max lifetime
 	db.SetConnMaxLifetime(config.ConnectionMaxLifetime)
 
