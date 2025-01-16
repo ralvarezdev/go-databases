@@ -73,9 +73,16 @@ func (d *DefaultService) RunTransaction(fn func(tx *sql.Tx) error) error {
 
 // RunQueriesConcurrently runs queries concurrently
 func (d *DefaultService) RunQueriesConcurrently(
-	queries ...func(db *sql.DB, ctx context.Context) error,
+	queries ...func(db *sql.DB) error,
 ) *[]error {
 	return godatabasessql.RunQueriesConcurrently(d.db, queries...)
+}
+
+// RunQueriesConcurrentlyWithCancel runs queries concurrently with a cancel context
+func (d *DefaultService) RunQueriesConcurrentlyWithCancel(
+	queries ...func(db *sql.DB, ctx context.Context) error,
+) *[]error {
+	return godatabasessql.RunQueriesConcurrentlyWithCancel(d.db, queries...)
 }
 
 // Exec executes a query with parameters and returns the result
