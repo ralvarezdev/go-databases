@@ -11,18 +11,21 @@ type (
 		MaxOpenConnections    int
 		MaxIdleConnections    int
 		ConnectionMaxLifetime time.Duration
+		ConnectionMaxIdleTime time.Duration
 	}
 )
 
 // NewConfig creates a new configuration
 func NewConfig(
-	maxOpenConnections int,
+	maxOpenConnections,
 	maxIdleConnections int,
+	connectionMaxIdleTime,
 	connectionMaxLifetime time.Duration,
 ) *Config {
 	return &Config{
 		MaxOpenConnections:    maxOpenConnections,
 		MaxIdleConnections:    maxIdleConnections,
+		ConnectionMaxIdleTime: connectionMaxIdleTime,
 		ConnectionMaxLifetime: connectionMaxLifetime,
 	}
 }
@@ -51,6 +54,9 @@ func Connect(
 
 	// Set the connection max lifetime
 	db.SetConnMaxLifetime(config.ConnectionMaxLifetime)
+
+	// Set the connection max idle time
+	db.SetConnMaxIdleTime(config.ConnectionMaxIdleTime)
 
 	return db, nil
 }
