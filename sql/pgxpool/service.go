@@ -115,7 +115,7 @@ func (d *DefaultService) ExecWithCtx(
 ) {
 	// Check if the query is nil
 	if query == nil {
-		return nil, godatabases.ErrNilQuery
+		panic(godatabases.ErrNilQuery)
 	}
 
 	// Run the exec
@@ -134,21 +134,6 @@ func (d *DefaultService) Exec(query *string, params ...interface{}) (
 	return d.ExecWithCtx(context.Background(), query, params...)
 }
 
-// QueryRowWithCtx runs a query row with parameters and returns the result row with a context
-func (d *DefaultService) QueryRowWithCtx(
-	ctx context.Context,
-	query *string,
-	params ...interface{},
-) pgx.Row {
-	// Check if the query is nil
-	if query == nil {
-		return nil
-	}
-
-	// Run the query row
-	return d.pool.QueryRow(ctx, *query, params...)
-}
-
 // QueryWithCtx runs a query with parameters and returns the result with a context
 func (d *DefaultService) QueryWithCtx(
 	ctx context.Context,
@@ -157,7 +142,7 @@ func (d *DefaultService) QueryWithCtx(
 ) (pgx.Rows, error) {
 	// Check if the query is nil
 	if query == nil {
-		return nil, godatabases.ErrNilQuery
+		panic(godatabases.ErrNilQuery)
 	}
 
 	// Run the query
@@ -170,6 +155,21 @@ func (d *DefaultService) Query(
 	params ...interface{},
 ) (pgx.Rows, error) {
 	return d.QueryWithCtx(context.Background(), query, params...)
+}
+
+// QueryRowWithCtx runs a query row with parameters and returns the result row with a context
+func (d *DefaultService) QueryRowWithCtx(
+	ctx context.Context,
+	query *string,
+	params ...interface{},
+) pgx.Row {
+	// Check if the query is nil
+	if query == nil {
+		panic(godatabases.ErrNilQuery)
+	}
+
+	// Run the query row
+	return d.pool.QueryRow(ctx, *query, params...)
 }
 
 // QueryRow runs a query row with parameters and returns the result row
