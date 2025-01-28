@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	godatabases "github.com/ralvarezdev/go-databases"
+	"time"
 )
 
 type (
@@ -37,11 +38,17 @@ type (
 			params ...interface{},
 		) pgx.Row
 		ScanRow(row pgx.Row, destinations ...interface{}) error
+		SetStatTicker(
+			duration time.Duration,
+			fn func(*pgxpool.Stat),
+		)
+		ClearStatTicker()
 	}
 
 	// DefaultService is the default service struct
 	DefaultService struct {
-		pool *pgxpool.Pool
+		pool       *pgxpool.Pool
+		statTicker *time.Ticker
 	}
 )
 
@@ -56,7 +63,7 @@ func NewDefaultService(pool *pgxpool.Pool) (
 	}
 
 	return &DefaultService{
-		pool,
+		pool: pool,
 	}, nil
 }
 
@@ -192,4 +199,35 @@ func (d *DefaultService) ScanRow(
 
 	// Scan the row
 	return row.Scan(destinations...)
+}
+
+// SetStatTicker sets a stat ticker
+func (d *DefaultService) SetStatTicker(
+	duration time.Duration,
+	fn func(*pgxpool.Stat),
+) {
+	// Check if the stat ticker is nil
+	if d.statTicker != nil {
+		d.statTicker.Stop()
+	}
+
+	// Set the stat ticker
+	d.statTicker = time.NewTicker(duration)
+
+	// Set the stat ticker
+	go func() {
+		for {
+			select {
+			case <-d.statTicker.C:
+				fn(d.pool.Stat())
+			}
+		}
+	}()
+}
+
+// ClearStatTicker clears the stat ticker
+func (d *DefaultService) ClearStatTicker() {
+	if d.statTicker != nil {
+		d.statTicker.Stop()
+	}
 }
