@@ -2,7 +2,6 @@ package pgxpool
 
 import (
 	"context"
-	"database/sql"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -31,7 +30,7 @@ type (
 			query *string,
 			params ...interface{},
 		) pgx.Row
-		ScanRow(row *sql.Row, destinations ...interface{}) error
+		ScanRow(row pgx.Row, destinations ...interface{}) error
 	}
 
 	// DefaultService is the default service struct
