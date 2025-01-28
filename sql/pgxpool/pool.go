@@ -2,7 +2,6 @@ package pgxpool
 
 import (
 	"context"
-	"database/sql"
 	"github.com/jackc/pgx/v5/pgxpool"
 	godatabases "github.com/ralvarezdev/go-databases"
 )
@@ -10,7 +9,7 @@ import (
 type (
 	// PoolHandler interface
 	PoolHandler interface {
-		Connect() (*sql.DB, error)
+		Connect() (*pgxpool.Pool, error)
 		Pool() (*pgxpool.Pool, error)
 		Disconnect()
 	}
