@@ -24,6 +24,12 @@ type (
 			query *string,
 			params ...interface{},
 		) (*pgconn.CommandTag, error)
+		Query(query *string, params ...interface{}) (pgx.Rows, error)
+		QueryWithCtx(
+			ctx context.Context,
+			query *string,
+			params ...interface{},
+		) (pgx.Rows, error)
 		QueryRow(query *string, params ...interface{}) pgx.Row
 		QueryRowWithCtx(
 			ctx context.Context,
@@ -141,6 +147,29 @@ func (d *DefaultService) QueryRowWithCtx(
 
 	// Run the query row
 	return d.pool.QueryRow(ctx, *query, params...)
+}
+
+// QueryWithCtx runs a query with parameters and returns the result with a context
+func (d *DefaultService) QueryWithCtx(
+	ctx context.Context,
+	query *string,
+	params ...interface{},
+) (pgx.Rows, error) {
+	// Check if the query is nil
+	if query == nil {
+		return nil, godatabases.ErrNilQuery
+	}
+
+	// Run the query
+	return d.pool.Query(ctx, *query, params...)
+}
+
+// Query runs a query with parameters and returns the result
+func (d *DefaultService) Query(
+	query *string,
+	params ...interface{},
+) (pgx.Rows, error) {
+	return d.QueryWithCtx(context.Background(), query, params...)
 }
 
 // QueryRow runs a query row with parameters and returns the result row
