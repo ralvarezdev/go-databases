@@ -7,59 +7,51 @@ import (
 )
 
 type (
-	// ConnectionHandler interface
-	ConnectionHandler interface {
+	// ConnHandler interface
+	ConnHandler interface {
 		Connect() (*redis.Client, error)
-		GetClient() (*redis.Client, error)
+		Client() (*redis.Client, error)
 		Disconnect()
 	}
 
-	// Config struct
-	Config struct {
-		Uri      string
-		Password string
-		Database int
-	}
-
-	// DefaultConnectionHandler struct
-	DefaultConnectionHandler struct {
-		Client        *redis.Client
-		ClientOptions *redis.Options
+	// DefaultConnHandler struct
+	DefaultConnHandler struct {
+		client        *redis.Client
+		clientOptions *redis.Options
 	}
 )
 
-// NewDefaultConnectionHandler creates a new connection
-func NewDefaultConnectionHandler(config *Config) (
-	*DefaultConnectionHandler,
+// NewDefaultConnHandler creates a new connection
+func NewDefaultConnHandler(config Config) (
+	*DefaultConnHandler,
 	error,
 ) {
 	// Check if the config is nil
 	if config == nil {
-		return nil, ErrNilConfig
+		return nil, godatabases.ErrNilConfig
 	}
 
 	// Define the Redis options
 	clientOptions := &redis.Options{
-		Addr:     config.Uri,
-		Password: config.Password,
-		DB:       config.Database,
+		Addr:     config.URI(),
+		Password: config.Password(),
+		DB:       config.Database(),
 	}
 
-	return &DefaultConnectionHandler{
-		ClientOptions: clientOptions,
-		Client:        nil,
+	return &DefaultConnHandler{
+		clientOptions: clientOptions,
 	}, nil
 }
 
 // Connect returns a new Redis client
-func (d *DefaultConnectionHandler) Connect() (*redis.Client, error) {
+func (d *DefaultConnHandler) Connect() (*redis.Client, error) {
 	// Check if the connection is already established
-	if d.Client != nil {
-		return d.Client, godatabases.ErrAlreadyConnected
+	if d.client != nil {
+		return d.client, godatabases.ErrAlreadyConnected
 	}
 
 	// Create a new Redis client
-	client := redis.NewClient(d.ClientOptions)
+	client := redis.NewClient(d.clientOptions)
 
 	// Ping the Redis server to check the connection
 	_, err := client.Ping(context.Background()).Result()
@@ -68,32 +60,30 @@ func (d *DefaultConnectionHandler) Connect() (*redis.Client, error) {
 	}
 
 	// Set client
-	d.Client = client
+	d.client = client
 
 	return client, nil
 }
 
-// GetClient returns the Redis client
-func (d *DefaultConnectionHandler) GetClient() (*redis.Client, error) {
+// Client returns the Redis client
+func (d *DefaultConnHandler) Client() (*redis.Client, error) {
 	// Check if the connection is established
-	if d.Client == nil {
+	if d.client == nil {
 		return nil, godatabases.ErrNotConnected
 	}
 
-	return d.Client, nil
+	return d.client, nil
 }
 
 // Disconnect closes the Redis client connection
-func (d *DefaultConnectionHandler) Disconnect() {
-	defer func() {
-		// Check if the connection is established
-		if d.Client == nil {
-			return
-		}
+func (d *DefaultConnHandler) Disconnect() {
+	// Check if the connection is established
+	if d.client == nil {
+		return
+	}
 
-		// Close the connection
-		if err := d.Client.Close(); err != nil {
-			panic(godatabases.ErrFailedToDisconnect)
-		}
-	}()
+	// Close the connection
+	if err := d.client.Close(); err != nil {
+		panic(godatabases.ErrFailedToDisconnect)
+	}
 }

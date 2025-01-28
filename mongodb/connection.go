@@ -5,63 +5,55 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
-	"time"
 )
 
 type (
-	// ConnectionHandler interface
-	ConnectionHandler interface {
+	// ConnHandler interface
+	ConnHandler interface {
 		Connect() (*mongo.Client, error)
-		GetClient() (*mongo.Client, error)
+		Client() (*mongo.Client, error)
 		Disconnect()
 	}
 
-	// Config struct
-	Config struct {
-		Uri     string
-		Timeout time.Duration
-	}
-
-	// DefaultConnectionHandler struct
-	DefaultConnectionHandler struct {
-		Ctx           context.Context
-		Cancel        context.CancelFunc
-		ClientOptions *options.ClientOptions
-		Client        *mongo.Client
+	// DefaultConnHandler struct
+	DefaultConnHandler struct {
+		ctx           context.Context
+		cancel        context.CancelFunc
+		clientOptions *options.ClientOptions
+		client        *mongo.Client
 	}
 )
 
-// NewDefaultConnectionHandler creates a new connection
-func NewDefaultConnectionHandler(config *Config) (
-	*DefaultConnectionHandler,
+// NewDefaultConnHandler creates a new connection
+func NewDefaultConnHandler(config Config) (
+	*DefaultConnHandler,
 	error,
 ) {
 	// Check if the config is nil
 	if config == nil {
-		return nil, ErrNilClient
+		return nil, godatabases.ErrNilConfig
 	}
 
 	// Set client options
-	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
-	clientOptions := options.Client().ApplyURI(config.Uri)
+	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout())
+	clientOptions := options.Client().ApplyURI(config.URI())
 
-	return &DefaultConnectionHandler{
-		Cancel:        cancel,
-		Ctx:           ctx,
-		ClientOptions: clientOptions,
-		Client:        nil,
+	return &DefaultConnHandler{
+		cancel:        cancel,
+		ctx:           ctx,
+		clientOptions: clientOptions,
 	}, nil
 }
 
 // Connect returns a new MongoDB client
-func (d *DefaultConnectionHandler) Connect() (*mongo.Client, error) {
+func (d *DefaultConnHandler) Connect() (*mongo.Client, error) {
 	// Check if the connection is already established
-	if d.Client != nil {
-		return d.Client, godatabases.ErrAlreadyConnected
+	if d.client != nil {
+		return d.client, godatabases.ErrAlreadyConnected
 	}
 
 	// Connect to MongoDB
-	client, err := mongo.Connect(d.Ctx, d.ClientOptions)
+	client, err := mongo.Connect(d.ctx, d.clientOptions)
 
 	// Create MongoDB Connection struct
 	if err != nil {
@@ -75,33 +67,31 @@ func (d *DefaultConnectionHandler) Connect() (*mongo.Client, error) {
 	}
 
 	// Set client
-	d.Client = client
+	d.client = client
 
 	return client, nil
 }
 
-// GetClient returns the MongoDB client
-func (d *DefaultConnectionHandler) GetClient() (*mongo.Client, error) {
+// Client returns the MongoDB client
+func (d *DefaultConnHandler) Client() (*mongo.Client, error) {
 	// Check if the connection is established
-	if d.Client == nil {
+	if d.client == nil {
 		return nil, godatabases.ErrNotConnected
 	}
 
-	return d.Client, nil
+	return d.client, nil
 }
 
 // Disconnect closes the MongoDB client connection
-func (d *DefaultConnectionHandler) Disconnect() {
-	defer func() {
-		// Check if the connection is established
-		if d.Client == nil {
-			return
-		}
+func (d *DefaultConnHandler) Disconnect() {
+	// Check if the connection is established
+	if d.client == nil {
+		return
+	}
 
-		// Close the connection
-		d.Cancel()
-		if err := d.Client.Disconnect(d.Ctx); err != nil {
-			panic(godatabases.ErrFailedToDisconnect)
-		}
-	}()
+	// Close the connection
+	d.cancel()
+	if err := d.client.Disconnect(d.ctx); err != nil {
+		panic(godatabases.ErrFailedToDisconnect)
+	}
 }

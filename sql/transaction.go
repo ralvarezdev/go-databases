@@ -7,9 +7,9 @@ import (
 
 // CreateTransaction creates a transaction for the database
 func CreateTransaction(db *sql.DB, fn func(tx *sql.Tx) error) error {
-	// Check if the database is nil
+	// Check if the connection is nil
 	if db == nil {
-		return godatabases.ErrNilDatabase
+		return godatabases.ErrNilConnection
 	}
 
 	// Start a transaction

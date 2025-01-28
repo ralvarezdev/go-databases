@@ -8,7 +8,7 @@ import (
 
 // Collection represents a MongoDB collection
 type Collection struct {
-	Name    string
+	name    string
 	Indexes *[]*mongo.IndexModel
 }
 
@@ -18,8 +18,8 @@ func NewCollection(
 	indexes *[]*mongo.IndexModel,
 ) *Collection {
 	return &Collection{
-		Name:    name,
-		Indexes: indexes,
+		name,
+		indexes,
 	}
 }
 
@@ -28,7 +28,7 @@ func (c *Collection) CreateCollection(database *mongo.Database) (
 	collection *mongo.Collection, err error,
 ) {
 	// Get the collection
-	collection = database.Collection(c.Name)
+	collection = database.Collection(c.name)
 
 	// Create the indexes
 	if err = c.createIndexes(collection); err != nil {

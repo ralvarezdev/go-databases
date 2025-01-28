@@ -32,7 +32,7 @@ func RunQueriesConcurrently(
 	// Wait for all queries to complete
 	wg.Wait()
 
-	// Close the error channel
+	// Disconnect the error channel
 	close(errCh)
 
 	// Return the errors if any
@@ -73,7 +73,7 @@ func RunQueriesConcurrentlyWithCancel(
 				// Send the error to the channel
 				errCh <- err
 
-				// Cancel the other queries
+				// cancel the other queries
 				cancel()
 			}
 		}(query)
@@ -82,7 +82,7 @@ func RunQueriesConcurrentlyWithCancel(
 	// Wait for all queries to complete
 	wg.Wait()
 
-	// Close the error channel
+	// Disconnect the error channel
 	close(errCh)
 
 	// Return the errors if any

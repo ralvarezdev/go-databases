@@ -34,7 +34,7 @@ func SetupJoinTable(
 ) error {
 	// Check if the database or the join field is nil
 	if database == nil {
-		return godatabases.ErrNilDatabase
+		return godatabases.ErrNilConnection
 	}
 	if joinField == nil {
 		return ErrNilJoinField

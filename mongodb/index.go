@@ -7,19 +7,19 @@ import (
 )
 
 type FieldIndex struct {
-	Name  string
-	Order Order
+	name  string
+	order Order
 }
 
 // NewFieldIndex creates a new field index
 func NewFieldIndex(name string, order Order) *FieldIndex {
-	return &FieldIndex{Name: name, Order: order}
+	return &FieldIndex{name, order}
 }
 
 // NewUniqueIndex creates a new unique field index model
 func NewUniqueIndex(fieldIndex FieldIndex, unique bool) *mongo.IndexModel {
 	return &mongo.IndexModel{
-		Keys:    bson.D{{fieldIndex.Name, fieldIndex.Order.OrderInt()}},
+		Keys:    bson.D{{fieldIndex.name, fieldIndex.order.OrderInt()}},
 		Options: options.Index().SetUnique(unique),
 	}
 }
@@ -41,7 +41,7 @@ func NewCompoundFieldIndex(
 	for _, fieldIndex := range fieldIndexes {
 		keys = append(
 			keys,
-			bson.E{Key: fieldIndex.Name, Value: fieldIndex.Order.OrderInt()},
+			bson.E{Key: fieldIndex.name, Value: fieldIndex.order.OrderInt()},
 		)
 	}
 

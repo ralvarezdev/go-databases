@@ -16,8 +16,8 @@ type (
 // NewModelConstraints creates a new model constraints
 func NewModelConstraints(model interface{}, names ...string) *ModelConstraints {
 	return &ModelConstraints{
-		model: model,
-		names: names,
+		model,
+		names,
 	}
 }
 
@@ -42,7 +42,7 @@ func CreateModelConstraints(
 ) (err error) {
 	// Check if the database or the constraint is nil
 	if database == nil {
-		return godatabases.ErrNilDatabase
+		return godatabases.ErrNilConnection
 	}
 	if modelConstraints == nil {
 		return ErrNilModelConstraints

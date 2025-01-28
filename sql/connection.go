@@ -2,78 +2,76 @@ package sql
 
 import (
 	"database/sql"
-	"time"
+	godatabases "github.com/ralvarezdev/go-databases"
 )
 
 type (
-	// Config struct
-	Config struct {
-		MaxOpenConnections    int
-		MaxIdleConnections    int
-		ConnectionMaxLifetime time.Duration
-		ConnectionMaxIdleTime time.Duration
+	// ConnHandler interface
+	ConnHandler interface {
+		Connect() (*sql.DB, error)
+		DB() (*sql.DB, error)
+		Disconnect()
+	}
+
+	// DefaultConnHandler struct
+	DefaultConnHandler struct {
+		config Config
+		db     *sql.DB
 	}
 )
 
-// NewConfig creates a new configuration
-func NewConfig(
-	maxOpenConnections,
-	maxIdleConnections int,
-	connectionMaxIdleTime,
-	connectionMaxLifetime time.Duration,
-) *Config {
-	return &Config{
-		MaxOpenConnections:    maxOpenConnections,
-		MaxIdleConnections:    maxIdleConnections,
-		ConnectionMaxIdleTime: connectionMaxIdleTime,
-		ConnectionMaxLifetime: connectionMaxLifetime,
+// NewDefaultConnHandler creates a new connection
+func NewDefaultConnHandler(
+	driverName, dataSourceName string,
+	config Config,
+) (*DefaultConnHandler, error) {
+	// Check if the configuration is nil
+	if config == nil {
+		return nil, godatabases.ErrNilConfig
 	}
+
+	return &DefaultConnHandler{
+		config: config,
+		db:     nil,
+	}, nil
 }
 
 // Connect returns a new SQL connection
-func Connect(
-	driverName, dataSourceName string,
-	config *Config,
-) (*sql.DB, error) {
+func (d *DefaultConnHandler) Connect() (*sql.DB, error) {
 	// Open a new connection
-	db, err := sql.Open(driverName, dataSourceName)
+	db, err := sql.Open(d.config.DriverName(), d.config.DataSourceName())
 	if err != nil {
 		return nil, err
 	}
 
-	// Check if the configuration is nil
-	if config == nil {
-		return db, nil
-	}
-
 	// Set the maximum open connections
-	db.SetMaxOpenConns(config.MaxOpenConnections)
+	db.SetMaxOpenConns(d.config.MaxOpenConnections())
 
 	// Set the maximum idle connections
-	db.SetMaxIdleConns(config.MaxIdleConnections)
+	db.SetMaxIdleConns(d.config.MaxIdleConnections())
 
 	// Set the connection max lifetime
-	db.SetConnMaxLifetime(config.ConnectionMaxLifetime)
+	db.SetConnMaxLifetime(d.config.ConnectionMaxLifetime())
 
 	// Set the connection max idle time
-	db.SetConnMaxIdleTime(config.ConnectionMaxIdleTime)
+	db.SetConnMaxIdleTime(d.config.ConnectionMaxIdleTime())
+
+	// Set client
+	d.db = db
 
 	return db, nil
 }
 
-// Close closes the SQL connection
-func Close(db *sql.DB) error {
+// DB returns the SQL connection
+func (d *DefaultConnHandler) DB() (*sql.DB, error) {
+	if d.db == nil {
+		return nil, godatabases.ErrNotConnected
+	}
+
+	return d.db, nil
+}
+
+// Disconnect closes the SQL connection
+func Disconnect(db *sql.DB) error {
 	return db.Close()
-}
-
-// Connect returns a new SQL connection
-func (c *Config) Connect(
-	driverName, dataSourceName string,
-) (*sql.DB, error) {
-	return Connect(driverName, dataSourceName, c)
-}
-
-// Close closes the SQL connection
-func (c *Config) Close(db *sql.DB) error {
-	return Close(db)
 }

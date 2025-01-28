@@ -1,11 +1,8 @@
-package service
+package sql
 
 import (
-	"context"
 	"database/sql"
 	godatabases "github.com/ralvarezdev/go-databases"
-	godatabasessql "github.com/ralvarezdev/go-databases/sql"
-	"strings"
 )
 
 type (
@@ -13,7 +10,7 @@ type (
 	Service interface {
 		DB() *sql.DB
 		Migrate(queries ...string) error
-		RunTransaction(fn func(tx *sql.Tx) error) error
+		CreateTransaction(fn func(tx *sql.Tx) error) error
 		Exec(query *string, params ...interface{}) (sql.Result, error)
 		QueryRow(query *string, params ...interface{}) *sql.Row
 		ScanRow(row *sql.Row, destinations ...interface{}) error
@@ -30,17 +27,14 @@ func NewDefaultService(db *sql.DB) (
 	instance *DefaultService,
 	err error,
 ) {
-	// Check if the database is nil
+	// Check if the connection is nil
 	if db == nil {
-		return nil, godatabases.ErrNilDatabase
+		return nil, godatabases.ErrNilConnection
 	}
 
-	// CreateTransaction the instance
-	instance = &DefaultService{
-		db: db,
-	}
-
-	return instance, nil
+	return &DefaultService{
+		db,
+	}, nil
 }
 
 // DB returns the database
@@ -55,34 +49,23 @@ func (d *DefaultService) Migrate(queries ...string) error {
 		return nil
 	}
 
-	// Join the migrate queries into a single migration
-	migration := strings.Join(
-		queries,
-		"\n",
+	// Create a new transaction
+	return d.CreateTransaction(
+		func(tx *sql.Tx) error {
+			// Execute the migration
+			for _, query := range queries {
+				if _, err := tx.Exec(query); err != nil {
+					return err
+				}
+			}
+			return nil
+		},
 	)
-
-	// Execute the migration
-	_, err := d.db.Exec(migration)
-	return err
 }
 
-// RunTransaction runs a transaction
-func (d *DefaultService) RunTransaction(fn func(tx *sql.Tx) error) error {
-	return godatabasessql.CreateTransaction(d.db, fn)
-}
-
-// RunQueriesConcurrently runs queries concurrently
-func (d *DefaultService) RunQueriesConcurrently(
-	queries ...func(db *sql.DB) error,
-) *[]error {
-	return godatabasessql.RunQueriesConcurrently(d.db, queries...)
-}
-
-// RunQueriesConcurrentlyWithCancel runs queries concurrently with a cancel context
-func (d *DefaultService) RunQueriesConcurrentlyWithCancel(
-	queries ...func(db *sql.DB, ctx context.Context) error,
-) *[]error {
-	return godatabasessql.RunQueriesConcurrentlyWithCancel(d.db, queries...)
+// CreateTransaction creates a transaction for the database
+func (d *DefaultService) CreateTransaction(fn func(tx *sql.Tx) error) error {
+	return CreateTransaction(d.db, fn)
 }
 
 // Exec executes a query with parameters and returns the result
@@ -92,7 +75,7 @@ func (d *DefaultService) Exec(query *string, params ...interface{}) (
 ) {
 	// Check if the query is nil
 	if query == nil {
-		return nil, godatabasessql.ErrNilQuery
+		return nil, godatabases.ErrNilQuery
 	}
 
 	// Run the exec
@@ -120,7 +103,7 @@ func (d *DefaultService) ScanRow(
 ) error {
 	// Check if the row is nil
 	if row == nil {
-		return godatabasessql.ErrNilRow
+		return godatabases.ErrNilRow
 	}
 
 	// Scan the row
