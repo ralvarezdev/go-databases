@@ -14,7 +14,7 @@ type (
 	Service interface {
 		Pool() *pgxpool.Pool
 		Migrate(queries ...string) error
-		CreateTransaction(fn func(tx pgx.Tx) error) error
+		CreateTransaction(fn func(ctx context.Context, tx pgx.Tx) error) error
 		CreateTransactionWithCtx(
 			ctx context.Context,
 			fn func(ctx context.Context, tx pgx.Tx) error,
@@ -69,7 +69,7 @@ func (d *DefaultService) Migrate(queries ...string) error {
 
 	// Create a new transaction
 	return d.CreateTransaction(
-		func(tx pgx.Tx) error {
+		func(ctx context.Context, tx pgx.Tx) error {
 			// Execute the migration
 			for _, query := range queries {
 				if _, err := tx.Exec(context.Background(), query); err != nil {
@@ -82,14 +82,19 @@ func (d *DefaultService) Migrate(queries ...string) error {
 }
 
 // CreateTransaction creates a transaction for the database
-func (d *DefaultService) CreateTransaction(fn func(tx pgx.Tx) error) error {
+func (d *DefaultService) CreateTransaction(
+	fn func(
+		ctx context.Context,
+		tx pgx.Tx,
+	) error,
+) error {
 	return CreateTransaction(d.pool, fn)
 }
 
 // CreateTransactionWithCtx creates a transaction for the database with a context
 func (d *DefaultService) CreateTransactionWithCtx(
 	ctx context.Context,
-	fn func(tx pgx.Tx) error,
+	fn func(ctx context.Context, tx pgx.Tx) error,
 ) error {
 	return CreateTransactionWithCtx(ctx, d.pool, fn)
 }

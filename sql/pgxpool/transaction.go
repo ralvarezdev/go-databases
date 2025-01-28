@@ -11,7 +11,7 @@ import (
 func CreateTransactionWithCtx(
 	ctx context.Context,
 	pool *pgxpool.Pool,
-	fn func(tx pgx.Tx) error,
+	fn func(ctx context.Context, tx pgx.Tx) error,
 ) error {
 	// Check if the pool is nil
 	if pool == nil {
@@ -25,7 +25,7 @@ func CreateTransactionWithCtx(
 	}
 
 	// Execute the transaction function
-	if fnErr := fn(tx); fnErr != nil {
+	if fnErr := fn(ctx, tx); fnErr != nil {
 		err = tx.Rollback(ctx)
 		if err != nil {
 			return err
@@ -38,6 +38,9 @@ func CreateTransactionWithCtx(
 }
 
 // CreateTransaction creates a transaction for the database
-func CreateTransaction(pool *pgxpool.Pool, fn func(tx pgx.Tx) error) error {
+func CreateTransaction(
+	pool *pgxpool.Pool,
+	fn func(ctx context.Context, tx pgx.Tx) error,
+) error {
 	return CreateTransactionWithCtx(context.Background(), pool, fn)
 }
