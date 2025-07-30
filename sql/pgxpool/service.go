@@ -2,11 +2,12 @@ package pgxpool
 
 import (
 	"context"
+	"time"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	godatabases "github.com/ralvarezdev/go-databases"
-	"time"
 )
 
 type (

@@ -1,8 +1,9 @@
 package sql
 
 import (
-	godatabases "github.com/ralvarezdev/go-databases"
 	"time"
+
+	godatabases "github.com/ralvarezdev/go-databases"
 )
 
 type (
