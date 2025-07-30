@@ -2,6 +2,7 @@ package sql
 
 import (
 	"database/sql"
+
 	godatabases "github.com/ralvarezdev/go-databases"
 )
 

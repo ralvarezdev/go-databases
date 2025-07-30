@@ -5,7 +5,10 @@ import (
 )
 
 // PrepareFindOneOptions prepares the find one options
-func PrepareFindOneOptions(projection interface{}, sort interface{}) *options.FindOneOptions {
+func PrepareFindOneOptions(
+	projection interface{},
+	sort interface{},
+) *options.FindOneOptions {
 	// Create the find options
 	findOptions := options.FindOne()
 
@@ -23,7 +26,12 @@ func PrepareFindOneOptions(projection interface{}, sort interface{}) *options.Fi
 }
 
 // PrepareFindOptions prepares the find options
-func PrepareFindOptions(projection interface{}, sort interface{}, limit int64, skip int64) *options.FindOptions {
+func PrepareFindOptions(
+	projection interface{},
+	sort interface{},
+	limit int64,
+	skip int64,
+) *options.FindOptions {
 	// Create the find options
 	findOptions := options.Find()
 
