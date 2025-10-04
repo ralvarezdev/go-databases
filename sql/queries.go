@@ -15,11 +15,11 @@ import (
 //
 // Returns:
 //
-//	*[]error: A pointer to a slice of errors, or nil if no errors occurred
+//	[]error: A slice of errors, or nil if no errors occurred
 func RunQueriesConcurrently(
 	db *sql.DB,
 	queries ...func(db *sql.DB) error,
-) *[]error {
+) []error {
 	// Create a wait group
 	var wg sync.WaitGroup
 	wg.Add(len(queries))
@@ -55,7 +55,7 @@ func RunQueriesConcurrently(
 		return nil
 	}
 
-	return &errors
+	return errors
 }
 
 // RunQueriesConcurrentlyWithCancel runs multiple queries concurrently with a cancel context
@@ -67,11 +67,11 @@ func RunQueriesConcurrently(
 //
 // Returns:
 //
-//	*[]error: A pointer to a slice of errors, or nil if no errors occurred
+//	[]error: A slice of errors, or nil if no errors occurred
 func RunQueriesConcurrentlyWithCancel(
 	db *sql.DB,
 	queries ...func(db *sql.DB, ctx context.Context) error,
-) *[]error {
+) []error {
 	// Create a context with a cancellation function
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -114,5 +114,5 @@ func RunQueriesConcurrentlyWithCancel(
 		return nil
 	}
 
-	return &errors
+	return errors
 }

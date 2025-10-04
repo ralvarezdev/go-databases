@@ -11,7 +11,7 @@ type (
 	// Collection represents a MongoDB collection
 	Collection struct {
 		name    string
-		Indexes *[]*mongo.IndexModel
+		Indexes []*mongo.IndexModel
 	}
 )
 
@@ -27,7 +27,7 @@ type (
 //   - *Collection: the new collection
 func NewCollection(
 	name string,
-	indexes *[]*mongo.IndexModel,
+	indexes []*mongo.IndexModel,
 ) *Collection {
 	return &Collection{
 		name,
@@ -64,20 +64,22 @@ func (c Collection) CreateCollection(database *mongo.Database) (
 //
 //   - error: if there was an error creating the indexes
 func (c Collection) createIndexes(collection *mongo.Collection) (err error) {
-	if c.Indexes != nil {
-		for _, index := range *c.Indexes {
-			// Check if the index is nil
-			if index == nil {
-				continue
-			}
+	if c.Indexes == nil {
+		return nil
+	}
 
-			// Create the index
-			_, err = collection.Indexes().CreateOne(
-				context.Background(), *index,
-			)
-			if err != nil {
-				return fmt.Errorf(ErrFailedToCreateIndex, *index, err)
-			}
+	for _, index := range c.Indexes {
+		// Check if the index is nil
+		if index == nil {
+			continue
+		}
+
+		// Create the index
+		_, err = collection.Indexes().CreateOne(
+			context.Background(), *index,
+		)
+		if err != nil {
+			return fmt.Errorf(ErrFailedToCreateIndex, *index, err)
 		}
 	}
 	return nil
