@@ -22,8 +22,15 @@ type (
 )
 
 // NewDefaultConnHandler creates a new connection
+//
+// Parameters:
+//
+//   - config: the configuration for the connection
+//
+// Returns:
+//
+//   - *DefaultConnHandler: the connection handler
 func NewDefaultConnHandler(
-	driverName, dataSourceName string,
 	config Config,
 ) (*DefaultConnHandler, error) {
 	// Check if the configuration is nil
@@ -33,12 +40,20 @@ func NewDefaultConnHandler(
 
 	return &DefaultConnHandler{
 		config: config,
-		db:     nil,
 	}, nil
 }
 
 // Connect returns a new SQL connection
+//
+// Returns:
+//
+//   - *sql.DB: the SQL connection
+//   - error: if any error occurred
 func (d *DefaultConnHandler) Connect() (*sql.DB, error) {
+	if d == nil {
+		return nil, godatabases.ErrNilConnHandler
+	}
+
 	// Open a new connection
 	db, err := sql.Open(d.config.DriverName(), d.config.DataSourceName())
 	if err != nil {
@@ -64,7 +79,16 @@ func (d *DefaultConnHandler) Connect() (*sql.DB, error) {
 }
 
 // DB returns the SQL connection
+//
+// Returns:
+//
+//   - *sql.DB: the SQL connection
+//   - error: if any error occurred
 func (d *DefaultConnHandler) DB() (*sql.DB, error) {
+	if d == nil {
+		return nil, godatabases.ErrNilConnHandler
+	}
+
 	if d.db == nil {
 		return nil, godatabases.ErrNotConnected
 	}
@@ -73,6 +97,15 @@ func (d *DefaultConnHandler) DB() (*sql.DB, error) {
 }
 
 // Disconnect closes the SQL connection
-func Disconnect(db *sql.DB) error {
-	return db.Close()
+func (d *DefaultService) Disconnect() error {
+	if d == nil {
+		return godatabases.ErrNilConnHandler
+	}
+
+	// Check if the connection is established
+	if d.db == nil {
+		return nil
+	}
+
+	return d.db.Close()
 }

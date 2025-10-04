@@ -7,6 +7,15 @@ import (
 )
 
 // RunQueriesConcurrently runs multiple queries concurrently
+//
+// Parameters:
+//
+//	db: The database connection
+//	queries: The queries to run
+//
+// Returns:
+//
+//	*[]error: A pointer to a slice of errors, or nil if no errors occurred
 func RunQueriesConcurrently(
 	db *sql.DB,
 	queries ...func(db *sql.DB) error,
@@ -50,6 +59,15 @@ func RunQueriesConcurrently(
 }
 
 // RunQueriesConcurrentlyWithCancel runs multiple queries concurrently with a cancel context
+//
+// Parameters:
+//
+//	db: The database connection
+//	queries: The queries to run
+//
+// Returns:
+//
+//	*[]error: A pointer to a slice of errors, or nil if no errors occurred
 func RunQueriesConcurrentlyWithCancel(
 	db *sql.DB,
 	queries ...func(db *sql.DB, ctx context.Context) error,

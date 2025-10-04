@@ -15,6 +15,16 @@ type (
 )
 
 // NewJoinField creates a new join field
+//
+// Parameters:
+//
+//   - model: the model struct
+//   - field: the field name
+//   - joinTable: the join table struct
+//
+// Returns:
+//
+//   - *JoinField: the join field
 func NewJoinField(
 	model interface{},
 	field string,
@@ -28,6 +38,15 @@ func NewJoinField(
 }
 
 // SetupJoinTable setups the join table
+//
+// Parameters:
+//
+//   - database: the gorm database connection
+//   - joinField: the join field
+//
+// Returns:
+//
+//   - error: if any error occurs
 func SetupJoinTable(
 	database *gorm.DB,
 	joinField *JoinField,
@@ -48,6 +67,15 @@ func SetupJoinTable(
 }
 
 // SetupJoinTables setups the join tables
+//
+// Parameters:
+//
+//   - database: the gorm database connection
+//   - joinFields: the join fields
+//
+// Returns:
+//
+//   - error: if any error occurs
 func SetupJoinTables(
 	database *gorm.DB,
 	joinFields []*JoinField,

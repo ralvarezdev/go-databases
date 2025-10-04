@@ -5,6 +5,15 @@ import (
 )
 
 // PrepareFindOneOptions prepares the find one options
+//
+// Parameters:
+//
+//   - projection: The projection to apply to the query
+//   - sort: The sort to apply to the query
+//
+// Returns:
+//
+//   - *options.FindOneOptions: The prepared find one options
 func PrepareFindOneOptions(
 	projection interface{},
 	sort interface{},
@@ -26,6 +35,17 @@ func PrepareFindOneOptions(
 }
 
 // PrepareFindOptions prepares the find options
+//
+// Parameters:
+//
+//   - projection: The projection to apply to the query
+//   - sort: The sort to apply to the query
+//   - limit: The limit to apply to the query
+//   - skip: The skip to apply to the query
+//
+// Returns:
+//
+//   - *options.FindOptions: The prepared find options
 func PrepareFindOptions(
 	projection interface{},
 	sort interface{},
@@ -59,6 +79,14 @@ func PrepareFindOptions(
 }
 
 // PrepareUpdateOptions prepares the update options
+//
+// Parameters:
+//
+//   - upsert: Whether to upsert the document if it doesn't exist
+//
+// Returns:
+//
+//   - *options.UpdateOptions: The prepared update options
 func PrepareUpdateOptions(upsert bool) *options.UpdateOptions {
 	// Create the update options
 	updateOptions := options.Update()
@@ -70,6 +98,17 @@ func PrepareUpdateOptions(upsert bool) *options.UpdateOptions {
 }
 
 // PrepareFindOneAndUpdateOptions prepares the find one and update options
+//
+// Parameters:
+//
+//   - projection: The projection to apply to the query
+//   - sort: The sort to apply to the query
+//   - upsert: Whether to upsert the document if it doesn't exist
+//   - returnDocument: The return document option
+//
+// Returns:
+//
+//   - *options.FindOneAndUpdateOptions: The prepared find one and update options
 func PrepareFindOneAndUpdateOptions(
 	projection interface{},
 	sort interface{},

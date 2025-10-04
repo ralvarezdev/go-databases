@@ -9,12 +9,24 @@ import (
 )
 
 // CreateTransactionOptions creates the transaction options
+//
+// Returns:
+//
+// *options.TransactionOptions: the transaction options
 func CreateTransactionOptions() *options.TransactionOptions {
 	wc := writeconcern.Majority()
 	return options.Transaction().SetWriteConcern(wc)
 }
 
 // CreateSession creates a new session
+//
+// Parameters:
+//
+// *client *mongo.Client: the MongoDB client
+//
+// Returns:
+//
+// (mongo.Session, error): the MongoDB session and an error if any
 func CreateSession(client *mongo.Client) (mongo.Session, error) {
 	// Check if the client is nil
 	if client == nil {
@@ -25,6 +37,15 @@ func CreateSession(client *mongo.Client) (mongo.Session, error) {
 }
 
 // CreateTransaction creates a new transaction
+//
+// Parameters:
+//
+// *client *mongo.Client: the MongoDB client
+// *queries func(sc mongo.SessionContext) error: the queries to execute in the transaction
+//
+// Returns:
+//
+// error: an error if any
 func CreateTransaction(
 	client *mongo.Client,
 	queries func(sc mongo.SessionContext) error,

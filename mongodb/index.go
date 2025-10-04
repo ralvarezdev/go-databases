@@ -6,10 +6,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type FieldIndex struct {
-	name  string
-	order Order
-}
+type (
+	// FieldIndex represents a field index
+	FieldIndex struct {
+		name  string
+		order Order
+	}
+)
 
 // NewFieldIndex creates a new field index
 func NewFieldIndex(name string, order Order) *FieldIndex {

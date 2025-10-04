@@ -19,6 +19,15 @@ type (
 )
 
 // NewConnConfig creates a new MongoDB connection configuration
+//
+// Parameters:
+//
+// - uri: MongoDB URI
+// - timeout: MongoDB connection timeout
+//
+// Returns:
+//
+// - *ConnConfig: MongoDB connection configuration
 func NewConnConfig(uri string, timeout time.Duration) *ConnConfig {
 	return &ConnConfig{
 		uri,
@@ -27,11 +36,19 @@ func NewConnConfig(uri string, timeout time.Duration) *ConnConfig {
 }
 
 // URI returns the MongoDB URI
-func (c *ConnConfig) URI() string {
+//
+// Returns:
+//
+// - string: MongoDB URI
+func (c ConnConfig) URI() string {
 	return c.uri
 }
 
 // Timeout returns the MongoDB connection timeout
-func (c *ConnConfig) Timeout() time.Duration {
+//
+// Returns:
+//
+// - time.Duration: MongoDB connection timeout
+func (c ConnConfig) Timeout() time.Duration {
 	return c.timeout
 }

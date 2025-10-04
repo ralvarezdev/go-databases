@@ -17,6 +17,16 @@ type (
 )
 
 // NewConnConfig creates a new Redis config
+//
+// Parameters:
+//
+//   - uri: the URI
+//   - password: the password
+//   - database: the database
+//
+// Returns:
+//
+// *ConnConfig: the Redis config
 func NewConnConfig(uri, password string, database int) *ConnConfig {
 	return &ConnConfig{
 		uri,
@@ -26,16 +36,28 @@ func NewConnConfig(uri, password string, database int) *ConnConfig {
 }
 
 // URI returns the URI
-func (c *ConnConfig) URI() string {
+//
+// Returns:
+//
+// string: the URI
+func (c ConnConfig) URI() string {
 	return c.uri
 }
 
 // Password returns the password
-func (c *ConnConfig) Password() string {
+//
+// Returns:
+//
+// string: the password
+func (c ConnConfig) Password() string {
 	return c.password
 }
 
 // Database returns the database
-func (c *ConnConfig) Database() int {
+//
+// Returns:
+//
+// int: the database
+func (c ConnConfig) Database() int {
 	return c.database
 }

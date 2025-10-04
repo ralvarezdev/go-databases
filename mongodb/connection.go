@@ -25,6 +25,15 @@ type (
 )
 
 // NewDefaultConnHandler creates a new connection
+//
+// Parameters:
+//
+//   - config: Config interface
+//
+// Returns:
+//
+//   - *DefaultConnHandler: DefaultConnHandler struct
+//   - error: error if any
 func NewDefaultConnHandler(config Config) (
 	*DefaultConnHandler,
 	error,
@@ -46,7 +55,16 @@ func NewDefaultConnHandler(config Config) (
 }
 
 // Connect returns a new MongoDB client
+//
+// Returns:
+//
+//   - *mongo.Client: MongoDB client
+//   - error: error if any
 func (d *DefaultConnHandler) Connect() (*mongo.Client, error) {
+	if d == nil {
+		return nil, godatabases.ErrNilConnHandler
+	}
+
 	// Check if the connection is already established
 	if d.client != nil {
 		return d.client, godatabases.ErrAlreadyConnected
@@ -73,7 +91,16 @@ func (d *DefaultConnHandler) Connect() (*mongo.Client, error) {
 }
 
 // Client returns the MongoDB client
+//
+// Returns:
+//
+//   - *mongo.Client: MongoDB client
+//   - error: error if any
 func (d *DefaultConnHandler) Client() (*mongo.Client, error) {
+	if d == nil {
+		return nil, godatabases.ErrNilConnHandler
+	}
+
 	// Check if the connection is established
 	if d.client == nil {
 		return nil, godatabases.ErrNotConnected
@@ -84,6 +111,10 @@ func (d *DefaultConnHandler) Client() (*mongo.Client, error) {
 
 // Disconnect closes the MongoDB client connection
 func (d *DefaultConnHandler) Disconnect() {
+	if d == nil {
+		return
+	}
+
 	// Check if the connection is established
 	if d.client == nil {
 		return

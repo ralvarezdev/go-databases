@@ -8,11 +8,26 @@ import (
 	godatabases "github.com/ralvarezdev/go-databases"
 )
 
+type (
+	// TransactionWithCtxFn is the function type for transactions with context
+	TransactionWithCtxFn func(ctx context.Context, tx pgx.Tx) error
+)
+
 // CreateTransactionWithCtx creates a transaction for the database with context
+//
+// Parameters:
+//
+//   - ctx: The context for the transaction
+//   - pool: The pgxpool.Pool instance
+//   - fn: The function to execute within the transaction
+//
+// Returns:
+//
+//   - error: An error if the transaction fails, otherwise nil
 func CreateTransactionWithCtx(
 	ctx context.Context,
 	pool *pgxpool.Pool,
-	fn func(ctx context.Context, tx pgx.Tx) error,
+	fn TransactionWithCtxFn,
 ) error {
 	// Check if the pool is nil
 	if pool == nil {
@@ -39,9 +54,18 @@ func CreateTransactionWithCtx(
 }
 
 // CreateTransaction creates a transaction for the database
+//
+// Parameters:
+//
+//   - pool: The pgxpool.Pool instance
+//   - fn: The function to execute within the transaction
+//
+// Returns:
+//
+//   - error: An error if the transaction fails, otherwise nil
 func CreateTransaction(
 	pool *pgxpool.Pool,
-	fn func(ctx context.Context, tx pgx.Tx) error,
+	fn TransactionWithCtxFn,
 ) error {
 	return CreateTransactionWithCtx(context.Background(), pool, fn)
 }

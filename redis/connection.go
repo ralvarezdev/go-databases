@@ -22,6 +22,15 @@ type (
 )
 
 // NewDefaultConnHandler creates a new connection
+//
+// Parameters:
+//
+// - config Config: configuration for the connection
+//
+// Returns:
+//
+// - *DefaultConnHandler: connection handler
+// - error: error if the config is nil
 func NewDefaultConnHandler(config Config) (
 	*DefaultConnHandler,
 	error,
@@ -44,7 +53,16 @@ func NewDefaultConnHandler(config Config) (
 }
 
 // Connect returns a new Redis client
+//
+// Returns:
+//
+// - *redis.Client: Redis client
+// - error: error if the connection fails or is already established
 func (d *DefaultConnHandler) Connect() (*redis.Client, error) {
+	if d == nil {
+		return nil, godatabases.ErrNilConnHandler
+	}
+
 	// Check if the connection is already established
 	if d.client != nil {
 		return d.client, godatabases.ErrAlreadyConnected
@@ -66,7 +84,16 @@ func (d *DefaultConnHandler) Connect() (*redis.Client, error) {
 }
 
 // Client returns the Redis client
+//
+// Returns:
+//
+// - *redis.Client: Redis client
+// - error: error if the connection is not established
 func (d *DefaultConnHandler) Client() (*redis.Client, error) {
+	if d == nil {
+		return nil, godatabases.ErrNilConnHandler
+	}
+
 	// Check if the connection is established
 	if d.client == nil {
 		return nil, godatabases.ErrNotConnected
@@ -77,6 +104,10 @@ func (d *DefaultConnHandler) Client() (*redis.Client, error) {
 
 // Disconnect closes the Redis client connection
 func (d *DefaultConnHandler) Disconnect() {
+	if d == nil {
+		return
+	}
+
 	// Check if the connection is established
 	if d.client == nil {
 		return

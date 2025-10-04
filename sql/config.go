@@ -29,6 +29,20 @@ type (
 )
 
 // NewConnConfig creates a new configuration for the connection
+//
+// Parameters:
+//
+//   - driverName: the name of the driver
+//   - dataSourceName: the data source name
+//   - maxOpenConnections: the maximum number of open connections
+//   - maxIdleConnections: the maximum number of idle connections
+//   - connectionMaxIdleTime: the maximum idle time for a connection
+//   - connectionMaxLifetime: the maximum lifetime for a connection
+//
+// Returns:
+//
+//   - *ConnConfig: the connection configuration
+//   - error: if any error occurs
 func NewConnConfig(
 	driverName,
 	dataSourceName string,
@@ -56,31 +70,55 @@ func NewConnConfig(
 }
 
 // DriverName returns the driver name
-func (c *ConnConfig) DriverName() string {
+//
+// Returns:
+//
+//   - string: the driver name
+func (c ConnConfig) DriverName() string {
 	return c.driverName
 }
 
 // DataSourceName returns the data source name
-func (c *ConnConfig) DataSourceName() string {
+//
+// Returns:
+//
+//   - string: the data source name
+func (c ConnConfig) DataSourceName() string {
 	return c.dataSourceName
 }
 
 // MaxOpenConnections returns the maximum open connections
-func (c *ConnConfig) MaxOpenConnections() int {
+//
+// Returns:
+//
+//   - int: the maximum open connections
+func (c ConnConfig) MaxOpenConnections() int {
 	return c.maxOpenConnections
 }
 
 // MaxIdleConnections returns the maximum idle connections
-func (c *ConnConfig) MaxIdleConnections() int {
+//
+// Returns:
+//
+//   - int: the maximum idle connections
+func (c ConnConfig) MaxIdleConnections() int {
 	return c.maxIdleConnections
 }
 
 // ConnectionMaxLifetime returns the connection max lifetime
-func (c *ConnConfig) ConnectionMaxLifetime() time.Duration {
+//
+// Returns:
+//
+//   - time.Duration: the connection max lifetime
+func (c ConnConfig) ConnectionMaxLifetime() time.Duration {
 	return c.connectionMaxLifetime
 }
 
 // ConnectionMaxIdleTime returns the connection max idle time
-func (c *ConnConfig) ConnectionMaxIdleTime() time.Duration {
+//
+// Returns:
+//
+//   - time.Duration: the connection max idle time
+func (c ConnConfig) ConnectionMaxIdleTime() time.Duration {
 	return c.connectionMaxIdleTime
 }

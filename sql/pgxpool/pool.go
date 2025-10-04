@@ -57,7 +57,16 @@ func (d *DefaultPoolHandler) Connect() (*pgxpool.Pool, error) {
 }
 
 // Pool returns the connection pool
+//
+// Returns:
+//
+//   - *pgxpool.Pool: the connection pool
+//   - error: if the connection is not established
 func (d *DefaultPoolHandler) Pool() (*pgxpool.Pool, error) {
+	if d == nil {
+		return nil, godatabases.ErrNilPoolHandler
+	}
+
 	// Check if the connection is established
 	if d.pool == nil {
 		return nil, godatabases.ErrNotConnected
@@ -68,6 +77,10 @@ func (d *DefaultPoolHandler) Pool() (*pgxpool.Pool, error) {
 
 // Disconnect closes the connection pool
 func (d *DefaultPoolHandler) Disconnect() {
+	if d == nil {
+		return
+	}
+
 	// Check if the connection is established
 	if d.pool == nil {
 		return

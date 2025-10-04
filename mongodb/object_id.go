@@ -6,6 +6,15 @@ import (
 )
 
 // GetObjectIdFromString gets the object ID from the string
+//
+// Parameters:
+//
+//   - id: the string ID to convert
+//
+// Returns:
+//
+//   - *primitive.ObjectID: the object ID
+//   - error: if any error occurred
 func GetObjectIdFromString(id string) (*primitive.ObjectID, error) {
 	// Check if the ID is empty
 	if id == "" {

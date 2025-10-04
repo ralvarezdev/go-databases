@@ -7,13 +7,24 @@ import (
 	"golang.org/x/net/context"
 )
 
-// Collection represents a MongoDB collection
-type Collection struct {
-	name    string
-	Indexes *[]*mongo.IndexModel
-}
+type (
+	// Collection represents a MongoDB collection
+	Collection struct {
+		name    string
+		Indexes *[]*mongo.IndexModel
+	}
+)
 
 // NewCollection creates a new MongoDB collection
+//
+// Parameters:
+//
+//   - name: the name of the collection
+//   - indexes: the indexes to create for the collection
+//
+// Returns:
+//
+//   - *Collection: the new collection
 func NewCollection(
 	name string,
 	indexes *[]*mongo.IndexModel,
@@ -25,7 +36,11 @@ func NewCollection(
 }
 
 // CreateCollection creates the collection
-func (c *Collection) CreateCollection(database *mongo.Database) (
+//
+// Parameters:
+//
+//   - database: the MongoDB database
+func (c Collection) CreateCollection(database *mongo.Database) (
 	collection *mongo.Collection, err error,
 ) {
 	// Get the collection
@@ -40,7 +55,15 @@ func (c *Collection) CreateCollection(database *mongo.Database) (
 }
 
 // createIndexes creates the indexes for the collection
-func (c *Collection) createIndexes(collection *mongo.Collection) (err error) {
+//
+// Parameters:
+//
+//   - collection: the MongoDB collection
+//
+// Returns:
+//
+//   - error: if there was an error creating the indexes
+func (c Collection) createIndexes(collection *mongo.Collection) (err error) {
 	if c.Indexes != nil {
 		for _, index := range *c.Indexes {
 			// Check if the index is nil

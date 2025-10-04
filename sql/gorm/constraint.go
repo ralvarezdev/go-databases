@@ -14,6 +14,15 @@ type (
 )
 
 // NewModelConstraints creates a new model constraints
+//
+// Parameters:
+//
+//   - model: The model to create the constraints for
+//   - names: The names of the constraints to create
+//
+// Returns:
+//
+//   - *ModelConstraints: The model constraints
 func NewModelConstraints(model interface{}, names ...string) *ModelConstraints {
 	return &ModelConstraints{
 		model,
@@ -22,6 +31,16 @@ func NewModelConstraints(model interface{}, names ...string) *ModelConstraints {
 }
 
 // HasConstraint checks if a constraint exists
+//
+// Parameters:
+//
+//   - database: The GORM database connection
+//   - model: The model to check the constraint
+//   - name: The name of the constraint to check
+//
+// Returns:
+//
+//   - bool: True if the constraint exists, false otherwise
 func HasConstraint(database *gorm.DB, model interface{}, name string) bool {
 	// Check if the database or the model is nil
 	if database == nil || model == nil {
@@ -36,6 +55,15 @@ func HasConstraint(database *gorm.DB, model interface{}, name string) bool {
 }
 
 // CreateModelConstraints creates model constraints
+//
+// Parameters:
+//
+//   - database: The GORM database connection
+//   - modelConstraints: The model constraints to create
+//
+// Returns:
+//
+//   - error: An error if something went wrong, or nil if everything went fine
 func CreateModelConstraints(
 	database *gorm.DB,
 	modelConstraints *ModelConstraints,
@@ -66,6 +94,15 @@ func CreateModelConstraints(
 }
 
 // CreateModelsConstraints creates models constraints
+//
+// Parameters:
+//
+//   - database: The GORM database connection
+//   - modelsConstraints: The models constraints to create
+//
+// Returns:
+//
+//   - error: An error if something went wrong, or nil if everything went fine
 func CreateModelsConstraints(
 	database *gorm.DB,
 	modelsConstraints []*ModelConstraints,

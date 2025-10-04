@@ -34,6 +34,21 @@ type (
 )
 
 // NewPoolConfig creates a new pool configuration
+//
+// Parameters:
+//
+//   - dataSourceName: the data source name
+//   - maxOpenConnections: the maximum number of open connections
+//   - maxIdleConnections: the maximum number of idle connections
+//   - connectionMaxIdleTime: the maximum idle time for a connection
+//   - connectionMaxLifetime: the maximum lifetime for a connection
+//   - healthCheckPeriod: the period for health checks
+//   - connectionMaxLifetimeJitter: the jitter for the maximum lifetime of a connection
+//
+// Returns:
+//
+//   - *PoolConfig: the pool configuration
+//   - error: if any error occurs
 func NewPoolConfig(
 	dataSourceName string,
 	maxOpenConnections,
@@ -60,42 +75,99 @@ func NewPoolConfig(
 }
 
 // DataSourceName returns the data source name
+//
+// Returns:
+//
+//   - string: the data source name
 func (p *PoolConfig) DataSourceName() string {
+	if p == nil {
+		return ""
+	}
 	return p.dataSourceName
 }
 
 // MaxOpenConnections returns the maximum open connections
+//
+// Returns:
+//
+//   - int: the maximum open connections
 func (p *PoolConfig) MaxOpenConnections() int {
+	if p == nil {
+		return 0
+	}
 	return p.maxOpenConnections
 }
 
 // MaxIdleConnections returns the maximum idle connections
+//
+// Returns:
+//
+//   - int: the maximum idle connections
 func (p *PoolConfig) MaxIdleConnections() int {
+	if p == nil {
+		return 0
+	}
 	return p.maxIdleConnections
 }
 
 // ConnectionMaxLifetime returns the connection max lifetime
+//
+// Returns:
+//
+//   - time.Duration: the connection max lifetime
 func (p *PoolConfig) ConnectionMaxLifetime() time.Duration {
+	if p == nil {
+		return 0
+	}
 	return p.connectionMaxLifetime
 }
 
 // ConnectionMaxIdleTime returns the connection max idle time
+//
+// Returns:
+//
+//   - time.Duration: the connection max idle time
 func (p *PoolConfig) ConnectionMaxIdleTime() time.Duration {
+	if p == nil {
+		return 0
+	}
 	return p.connectionMaxIdleTime
 }
 
 // HealthCheckPeriod returns the health check period
+//
+// Returns:
+//
+//   - time.Duration: the health check period
 func (p *PoolConfig) HealthCheckPeriod() time.Duration {
+	if p == nil {
+		return 0
+	}
 	return p.healthCheckPeriod
 }
 
 // ConnectionMaxLifetimeJitter returns the connection max lifetime jitter
+//
+// Returns:
+//
+//   - time.Duration: the connection max lifetime jitter
 func (p *PoolConfig) ConnectionMaxLifetimeJitter() time.Duration {
+	if p == nil {
+		return 0
+	}
 	return p.connectionMaxLifetimeJitter
 }
 
 // ParsedConfig returns the parsed configuration
+//
+// Returns:
+//
+//   - *pgxpool.Config: the parsed configuration
 func (p *PoolConfig) ParsedConfig() (*pgxpool.Config, error) {
+	if p == nil {
+		return nil, godatabases.ErrNilPoolConfig
+	}
+
 	// Check if the parsed configuration is nil
 	if p.parsedConfig != nil {
 		return p.parsedConfig, nil
