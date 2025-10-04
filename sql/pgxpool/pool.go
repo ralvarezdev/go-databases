@@ -8,13 +8,6 @@ import (
 )
 
 type (
-	// PoolHandler interface
-	PoolHandler interface {
-		Connect() (*pgxpool.Pool, error)
-		Pool() (*pgxpool.Pool, error)
-		Disconnect()
-	}
-
 	// DefaultPoolHandler struct
 	DefaultPoolHandler struct {
 		config Config

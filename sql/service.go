@@ -7,16 +7,6 @@ import (
 )
 
 type (
-	// Service is the interface for the service
-	Service interface {
-		DB() *sql.DB
-		Migrate(queries ...string) error
-		CreateTransaction(fn TransactionFn) error
-		Exec(query *string, params ...interface{}) (sql.Result, error)
-		QueryRow(query *string, params ...interface{}) *sql.Row
-		ScanRow(row *sql.Row, destinations ...interface{}) error
-	}
-
 	// DefaultService is the default service struct
 	DefaultService struct {
 		db *sql.DB

@@ -7,16 +7,6 @@ import (
 )
 
 type (
-	// Config interface
-	Config interface {
-		DriverName() string
-		DataSourceName() string
-		MaxOpenConnections() int
-		MaxIdleConnections() int
-		ConnectionMaxLifetime() time.Duration
-		ConnectionMaxIdleTime() time.Duration
-	}
-
 	// ConnConfig struct
 	ConnConfig struct {
 		driverName            string
