@@ -13,6 +13,7 @@ type (
 	// Handler interface
 	Handler interface {
 		Connect() (*pgxpool.Pool, error)
+		IsConnected() bool
 		Pool() (*pgxpool.Pool, error)
 		Disconnect()
 	}

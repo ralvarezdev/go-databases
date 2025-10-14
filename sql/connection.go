@@ -53,6 +53,11 @@ func (d *DefaultHandler) Connect() (*sql.DB, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
+	// Check if the connection is already established
+	if d.IsConnected() {
+		return d.db, nil
+	}
+
 	// Open a new connection
 	db, err := sql.Open(d.config.DriverName, d.config.DataSourceName)
 	if err != nil {
@@ -92,11 +97,23 @@ func (d *DefaultHandler) DB() (*sql.DB, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	if d.db == nil {
+	if !d.IsConnected() {
 		return nil, godatabases.ErrNotConnected
 	}
 
 	return d.db, nil
+}
+
+// IsConnected checks if the SQL connection is established
+//
+// Returns:
+//
+//   - bool: true if the connection is established, false otherwise
+func (d *DefaultHandler) IsConnected() bool {
+	if d == nil {
+		return false
+	}
+	return d.db != nil
 }
 
 // Disconnect closes the SQL connection
@@ -114,7 +131,7 @@ func (d *DefaultHandler) Disconnect() error {
 	defer d.mutex.Unlock()
 
 	// Check if the connection is established
-	if d.db == nil {
+	if !d.IsConnected() {
 		return nil
 	}
 

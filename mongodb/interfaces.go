@@ -8,6 +8,7 @@ type (
 	// Handler interface
 	Handler interface {
 		Connect() (*mongo.Client, error)
+		IsConnected() bool
 		Client() (*mongo.Client, error)
 		Disconnect() error
 	}

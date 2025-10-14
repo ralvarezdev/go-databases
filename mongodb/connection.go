@@ -66,8 +66,8 @@ func (d *DefaultHandler) Connect() (*mongo.Client, error) {
 	defer d.mutex.Unlock()
 
 	// Check if the connection is already established
-	if d.client != nil {
-		return d.client, godatabases.ErrAlreadyConnected
+	if d.IsConnected() {
+		return d.client, nil
 	}
 
 	// Connect to MongoDB
@@ -106,11 +106,23 @@ func (d *DefaultHandler) Client() (*mongo.Client, error) {
 	defer d.mutex.Unlock()
 
 	// Check if the connection is established
-	if d.client == nil {
+	if !d.IsConnected() {
 		return nil, godatabases.ErrNotConnected
 	}
 
 	return d.client, nil
+}
+
+// IsConnected checks if the MongoDB client is connected
+//
+// Returns:
+//
+//   - bool: true if connected, false otherwise
+func (d *DefaultHandler) IsConnected() bool {
+	if d == nil {
+		return false
+	}
+	return d.client != nil
 }
 
 // Disconnect closes the MongoDB client connection
@@ -128,7 +140,7 @@ func (d *DefaultHandler) Disconnect() error {
 	defer d.mutex.Unlock()
 
 	// Check if the connection is established
-	if d.client == nil {
+	if !d.IsConnected() {
 		return nil
 	}
 

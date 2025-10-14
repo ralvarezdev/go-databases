@@ -49,6 +49,11 @@ func (d *DefaultHandler) Connect() (*pgxpool.Pool, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
+	// Check if the connection is already established
+	if d.IsConnected() {
+		return d.pool, nil
+	}
+
 	// Get the parsed configuration
 	config, err := d.config.ParsedConfig()
 	if err != nil {
@@ -83,11 +88,23 @@ func (d *DefaultHandler) Pool() (*pgxpool.Pool, error) {
 	defer d.mutex.Unlock()
 
 	// Check if the connection is established
-	if d.pool == nil {
+	if !d.IsConnected() {
 		return nil, godatabases.ErrNotConnected
 	}
 
 	return d.pool, nil
+}
+
+// IsConnected checks if the connection is established
+//
+// Returns:
+//
+//   - bool: true if the connection is established, false otherwise
+func (d *DefaultHandler) IsConnected() bool {
+	if d == nil {
+		return false
+	}
+	return d.pool != nil
 }
 
 // Disconnect closes the connection pool
@@ -101,7 +118,7 @@ func (d *DefaultHandler) Disconnect() {
 	defer d.mutex.Unlock()
 
 	// Check if the connection is established
-	if d.pool == nil {
+	if !d.IsConnected() {
 		return
 	}
 

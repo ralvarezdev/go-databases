@@ -8,6 +8,7 @@ type (
 	// Handler interface
 	Handler interface {
 		Connect() (*redis.Client, error)
+		IsConnected() bool
 		Client() (*redis.Client, error)
 		Disconnect() error
 	}

@@ -6,7 +6,6 @@ var (
 	ErrNilConfig           = errors.New("config cannot be nil")
 	ErrNilConnection       = errors.New("connection cannot be nil")
 	ErrNilPool             = errors.New("pool cannot be nil")
-	ErrAlreadyConnected    = errors.New("connection to database already established")
 	ErrConnectionFailed    = errors.New("failed to connect to database")
 	ErrPingFailed          = errors.New("failed to ping database")
 	ErrNotConnected        = errors.New("connection to database not established")

@@ -8,6 +8,7 @@ type (
 	// Handler interface
 	Handler interface {
 		Connect() (*sql.DB, error)
+		IsConnected() bool
 		DB() (*sql.DB, error)
 		Disconnect() error
 	}
