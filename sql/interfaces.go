@@ -9,7 +9,7 @@ type (
 	Handler interface {
 		Connect() (*sql.DB, error)
 		DB() (*sql.DB, error)
-		Disconnect()
+		Disconnect() error
 	}
 
 	// Service is the interface for the service
