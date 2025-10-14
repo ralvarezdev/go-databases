@@ -2,22 +2,17 @@ package sql
 
 import (
 	"database/sql"
+	"sync"
 
 	godatabases "github.com/ralvarezdev/go-databases"
 )
 
 type (
-	// ConnHandler interface
-	ConnHandler interface {
-		Connect() (*sql.DB, error)
-		DB() (*sql.DB, error)
-		Disconnect()
-	}
-
 	// DefaultConnHandler struct
 	DefaultConnHandler struct {
 		config Config
 		db     *sql.DB
+		mutex  sync.Mutex
 	}
 )
 
@@ -54,6 +49,10 @@ func (d *DefaultConnHandler) Connect() (*sql.DB, error) {
 		return nil, godatabases.ErrNilConnHandler
 	}
 
+	// Lock the mutex to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	// Open a new connection
 	db, err := sql.Open(d.config.DriverName(), d.config.DataSourceName())
 	if err != nil {
@@ -89,6 +88,10 @@ func (d *DefaultConnHandler) DB() (*sql.DB, error) {
 		return nil, godatabases.ErrNilConnHandler
 	}
 
+	// Lock the mutex to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	if d.db == nil {
 		return nil, godatabases.ErrNotConnected
 	}
@@ -97,15 +100,30 @@ func (d *DefaultConnHandler) DB() (*sql.DB, error) {
 }
 
 // Disconnect closes the SQL connection
-func (d *DefaultService) Disconnect() error {
+//
+// Returns:
+//
+//   - error: if any error occurred
+func (d *DefaultConnHandler) Disconnect() error {
 	if d == nil {
 		return godatabases.ErrNilConnHandler
 	}
+
+	// Lock the mutex to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
 	// Check if the connection is established
 	if d.db == nil {
 		return nil
 	}
 
-	return d.db.Close()
+	// Close the connection
+	if err := d.db.Close(); err != nil {
+		return err
+	}
+
+	// Set the connection to nil
+	d.db = nil
+	return nil
 }

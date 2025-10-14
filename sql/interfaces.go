@@ -16,6 +16,13 @@ type (
 		ConnectionMaxIdleTime() time.Duration
 	}
 
+	// ConnHandler interface
+	ConnHandler interface {
+		Connect() (*sql.DB, error)
+		DB() (*sql.DB, error)
+		Disconnect()
+	}
+
 	// Service is the interface for the service
 	Service interface {
 		DB() *sql.DB

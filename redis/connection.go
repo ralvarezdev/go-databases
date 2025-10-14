@@ -1,23 +1,19 @@
 package redis
 
 import (
+	"sync"
+
 	"github.com/go-redis/redis/v8"
 	godatabases "github.com/ralvarezdev/go-databases"
 	"golang.org/x/net/context"
 )
 
 type (
-	// ConnHandler interface
-	ConnHandler interface {
-		Connect() (*redis.Client, error)
-		Client() (*redis.Client, error)
-		Disconnect()
-	}
-
 	// DefaultConnHandler struct
 	DefaultConnHandler struct {
 		client        *redis.Client
 		clientOptions *redis.Options
+		mutex         sync.Mutex
 	}
 )
 
@@ -63,6 +59,10 @@ func (d *DefaultConnHandler) Connect() (*redis.Client, error) {
 		return nil, godatabases.ErrNilConnHandler
 	}
 
+	// Mutex lock to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	// Check if the connection is already established
 	if d.client != nil {
 		return d.client, godatabases.ErrAlreadyConnected
@@ -94,6 +94,10 @@ func (d *DefaultConnHandler) Client() (*redis.Client, error) {
 		return nil, godatabases.ErrNilConnHandler
 	}
 
+	// Mutex lock to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	// Check if the connection is established
 	if d.client == nil {
 		return nil, godatabases.ErrNotConnected
@@ -103,18 +107,30 @@ func (d *DefaultConnHandler) Client() (*redis.Client, error) {
 }
 
 // Disconnect closes the Redis client connection
-func (d *DefaultConnHandler) Disconnect() {
+//
+// Returns:
+//
+// - error: error if the disconnection fails
+func (d *DefaultConnHandler) Disconnect() error {
 	if d == nil {
-		return
+		return godatabases.ErrNilConnHandler
 	}
+
+	// Mutex lock to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
 	// Check if the connection is established
 	if d.client == nil {
-		return
+		return nil
 	}
 
 	// Close the connection
 	if err := d.client.Close(); err != nil {
-		panic(godatabases.ErrFailedToDisconnect)
+		return godatabases.ErrFailedToDisconnect
 	}
+
+	// Set the client to nil
+	d.client = nil
+	return nil
 }

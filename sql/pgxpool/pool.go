@@ -2,6 +2,7 @@ package pgxpool
 
 import (
 	"context"
+	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	godatabases "github.com/ralvarezdev/go-databases"
@@ -12,6 +13,7 @@ type (
 	DefaultPoolHandler struct {
 		config Config
 		pool   *pgxpool.Pool
+		mutex  sync.Mutex
 	}
 )
 
@@ -31,6 +33,14 @@ func NewDefaultPoolHandler(
 
 // Connect returns a new connection pool
 func (d *DefaultPoolHandler) Connect() (*pgxpool.Pool, error) {
+	if d == nil {
+		return nil, godatabases.ErrNilConnHandler
+	}
+
+	// Lock the mutex to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	// Get the parsed configuration
 	config, err := d.config.ParsedConfig()
 	if err != nil {
@@ -60,6 +70,10 @@ func (d *DefaultPoolHandler) Pool() (*pgxpool.Pool, error) {
 		return nil, godatabases.ErrNilPoolHandler
 	}
 
+	// Lock the mutex to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	// Check if the connection is established
 	if d.pool == nil {
 		return nil, godatabases.ErrNotConnected
@@ -74,6 +88,10 @@ func (d *DefaultPoolHandler) Disconnect() {
 		return
 	}
 
+	// Lock the mutex to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	// Check if the connection is established
 	if d.pool == nil {
 		return
@@ -81,4 +99,7 @@ func (d *DefaultPoolHandler) Disconnect() {
 
 	// Close the connection pool
 	d.pool.Close()
+
+	// Set the pool to nil
+	d.pool = nil
 }

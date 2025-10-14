@@ -1,6 +1,8 @@
 package mongodb
 
 import (
+	"sync"
+
 	godatabases "github.com/ralvarezdev/go-databases"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -8,19 +10,13 @@ import (
 )
 
 type (
-	// ConnHandler interface
-	ConnHandler interface {
-		Connect() (*mongo.Client, error)
-		Client() (*mongo.Client, error)
-		Disconnect()
-	}
-
 	// DefaultConnHandler struct
 	DefaultConnHandler struct {
 		ctx           context.Context
 		cancel        context.CancelFunc
 		clientOptions *options.ClientOptions
 		client        *mongo.Client
+		mutex         sync.Mutex
 	}
 )
 
@@ -65,6 +61,10 @@ func (d *DefaultConnHandler) Connect() (*mongo.Client, error) {
 		return nil, godatabases.ErrNilConnHandler
 	}
 
+	// Lock the mutex to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	// Check if the connection is already established
 	if d.client != nil {
 		return d.client, godatabases.ErrAlreadyConnected
@@ -101,6 +101,10 @@ func (d *DefaultConnHandler) Client() (*mongo.Client, error) {
 		return nil, godatabases.ErrNilConnHandler
 	}
 
+	// Lock the mutex to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	// Check if the connection is established
 	if d.client == nil {
 		return nil, godatabases.ErrNotConnected
@@ -110,19 +114,31 @@ func (d *DefaultConnHandler) Client() (*mongo.Client, error) {
 }
 
 // Disconnect closes the MongoDB client connection
-func (d *DefaultConnHandler) Disconnect() {
+//
+// Returns:
+//
+//   - error: error if any
+func (d *DefaultConnHandler) Disconnect() error {
 	if d == nil {
-		return
+		return nil
 	}
+
+	// Lock the mutex to ensure thread safety
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
 	// Check if the connection is established
 	if d.client == nil {
-		return
+		return nil
 	}
 
 	// Close the connection
 	d.cancel()
 	if err := d.client.Disconnect(d.ctx); err != nil {
-		panic(godatabases.ErrFailedToDisconnect)
+		return err
 	}
+
+	// Set the client to nil
+	d.client = nil
+	return nil
 }
