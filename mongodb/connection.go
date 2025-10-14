@@ -58,7 +58,7 @@ func NewDefaultHandler(config *Config) (
 //   - error: error if any
 func (d *DefaultHandler) Connect() (*mongo.Client, error) {
 	if d == nil {
-		return nil, godatabases.ErrNilConnHandler
+		return nil, godatabases.ErrNilHandler
 	}
 
 	// Lock the mutex to ensure thread safety
@@ -98,7 +98,7 @@ func (d *DefaultHandler) Connect() (*mongo.Client, error) {
 //   - error: error if any
 func (d *DefaultHandler) Client() (*mongo.Client, error) {
 	if d == nil {
-		return nil, godatabases.ErrNilConnHandler
+		return nil, godatabases.ErrNilHandler
 	}
 
 	// Lock the mutex to ensure thread safety

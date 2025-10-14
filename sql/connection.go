@@ -46,7 +46,7 @@ func NewDefaultHandler(
 //   - error: if any error occurred
 func (d *DefaultHandler) Connect() (*sql.DB, error) {
 	if d == nil {
-		return nil, godatabases.ErrNilConnHandler
+		return nil, godatabases.ErrNilHandler
 	}
 
 	// Lock the mutex to ensure thread safety
@@ -85,7 +85,7 @@ func (d *DefaultHandler) Connect() (*sql.DB, error) {
 //   - error: if any error occurred
 func (d *DefaultHandler) DB() (*sql.DB, error) {
 	if d == nil {
-		return nil, godatabases.ErrNilConnHandler
+		return nil, godatabases.ErrNilHandler
 	}
 
 	// Lock the mutex to ensure thread safety
@@ -106,7 +106,7 @@ func (d *DefaultHandler) DB() (*sql.DB, error) {
 //   - error: if any error occurred
 func (d *DefaultHandler) Disconnect() error {
 	if d == nil {
-		return godatabases.ErrNilConnHandler
+		return godatabases.ErrNilHandler
 	}
 
 	// Lock the mutex to ensure thread safety

@@ -42,7 +42,7 @@ func NewDefaultHandler(
 // Connect returns a new connection pool
 func (d *DefaultHandler) Connect() (*pgxpool.Pool, error) {
 	if d == nil {
-		return nil, godatabases.ErrNilConnHandler
+		return nil, godatabases.ErrNilHandler
 	}
 
 	// Lock the mutex to ensure thread safety
@@ -75,7 +75,7 @@ func (d *DefaultHandler) Connect() (*pgxpool.Pool, error) {
 //   - error: if the connection is not established
 func (d *DefaultHandler) Pool() (*pgxpool.Pool, error) {
 	if d == nil {
-		return nil, godatabases.ErrNilPoolHandler
+		return nil, godatabases.ErrNilHandler
 	}
 
 	// Lock the mutex to ensure thread safety

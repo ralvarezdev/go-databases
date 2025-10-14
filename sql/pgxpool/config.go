@@ -68,7 +68,7 @@ func NewConfig(
 //   - *pgxpool.Config: the parsed configuration
 func (c *Config) ParsedConfig() (*pgxpool.Config, error) {
 	if c == nil {
-		return nil, godatabases.ErrNilPoolConfig
+		return nil, godatabases.ErrNilConfig
 	}
 
 	// Create a new parsed configuration

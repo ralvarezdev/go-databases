@@ -56,7 +56,7 @@ func NewDefaultHandler(config *Config) (
 // - error: error if the connection fails or is already established
 func (d *DefaultHandler) Connect() (*redis.Client, error) {
 	if d == nil {
-		return nil, godatabases.ErrNilConnHandler
+		return nil, godatabases.ErrNilHandler
 	}
 
 	// Mutex lock to ensure thread safety
@@ -91,7 +91,7 @@ func (d *DefaultHandler) Connect() (*redis.Client, error) {
 // - error: error if the connection is not established
 func (d *DefaultHandler) Client() (*redis.Client, error) {
 	if d == nil {
-		return nil, godatabases.ErrNilConnHandler
+		return nil, godatabases.ErrNilHandler
 	}
 
 	// Mutex lock to ensure thread safety
@@ -113,7 +113,7 @@ func (d *DefaultHandler) Client() (*redis.Client, error) {
 // - error: error if the disconnection fails
 func (d *DefaultHandler) Disconnect() error {
 	if d == nil {
-		return godatabases.ErrNilConnHandler
+		return godatabases.ErrNilHandler
 	}
 
 	// Mutex lock to ensure thread safety
