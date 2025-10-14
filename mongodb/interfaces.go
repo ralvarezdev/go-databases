@@ -5,8 +5,8 @@ import (
 )
 
 type (
-	// ConnHandler interface
-	ConnHandler interface {
+	// Handler interface
+	Handler interface {
 		Connect() (*mongo.Client, error)
 		Client() (*mongo.Client, error)
 		Disconnect() error

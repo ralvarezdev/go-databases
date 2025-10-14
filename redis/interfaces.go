@@ -5,8 +5,8 @@ import (
 )
 
 type (
-	// ConnHandler interface
-	ConnHandler interface {
+	// Handler interface
+	Handler interface {
 		Connect() (*redis.Client, error)
 		Client() (*redis.Client, error)
 		Disconnect() error

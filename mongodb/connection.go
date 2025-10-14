@@ -10,8 +10,8 @@ import (
 )
 
 type (
-	// DefaultConnHandler struct
-	DefaultConnHandler struct {
+	// DefaultHandler struct
+	DefaultHandler struct {
 		ctx           context.Context
 		cancel        context.CancelFunc
 		clientOptions *options.ClientOptions
@@ -20,18 +20,18 @@ type (
 	}
 )
 
-// NewDefaultConnHandler creates a new connection
+// NewDefaultHandler creates a new connection
 //
 // Parameters:
 //
-//   - config: Config interface
+//   - config *Config: configuration for the connection
 //
 // Returns:
 //
-//   - *DefaultConnHandler: DefaultConnHandler struct
+//   - *DefaultHandler: DefaultHandler struct
 //   - error: error if any
-func NewDefaultConnHandler(config Config) (
-	*DefaultConnHandler,
+func NewDefaultHandler(config *Config) (
+	*DefaultHandler,
 	error,
 ) {
 	// Check if the config is nil
@@ -40,10 +40,10 @@ func NewDefaultConnHandler(config Config) (
 	}
 
 	// Set client options
-	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout())
-	clientOptions := options.Client().ApplyURI(config.URI())
+	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
+	clientOptions := options.Client().ApplyURI(config.URI)
 
-	return &DefaultConnHandler{
+	return &DefaultHandler{
 		cancel:        cancel,
 		ctx:           ctx,
 		clientOptions: clientOptions,
@@ -56,7 +56,7 @@ func NewDefaultConnHandler(config Config) (
 //
 //   - *mongo.Client: MongoDB client
 //   - error: error if any
-func (d *DefaultConnHandler) Connect() (*mongo.Client, error) {
+func (d *DefaultHandler) Connect() (*mongo.Client, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilConnHandler
 	}
@@ -96,7 +96,7 @@ func (d *DefaultConnHandler) Connect() (*mongo.Client, error) {
 //
 //   - *mongo.Client: MongoDB client
 //   - error: error if any
-func (d *DefaultConnHandler) Client() (*mongo.Client, error) {
+func (d *DefaultHandler) Client() (*mongo.Client, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilConnHandler
 	}
@@ -118,7 +118,7 @@ func (d *DefaultConnHandler) Client() (*mongo.Client, error) {
 // Returns:
 //
 //   - error: error if any
-func (d *DefaultConnHandler) Disconnect() error {
+func (d *DefaultHandler) Disconnect() error {
 	if d == nil {
 		return nil
 	}

@@ -9,26 +9,26 @@ import (
 )
 
 type (
-	// DefaultConnHandler struct
-	DefaultConnHandler struct {
+	// DefaultHandler struct
+	DefaultHandler struct {
 		client        *redis.Client
 		clientOptions *redis.Options
 		mutex         sync.Mutex
 	}
 )
 
-// NewDefaultConnHandler creates a new connection
+// NewDefaultHandler creates a new connection
 //
 // Parameters:
 //
-// - config Config: configuration for the connection
+// - config *Config: configuration for the connection
 //
 // Returns:
 //
-// - *DefaultConnHandler: connection handler
+// - *DefaultHandler: connection handler
 // - error: error if the config is nil
-func NewDefaultConnHandler(config Config) (
-	*DefaultConnHandler,
+func NewDefaultHandler(config *Config) (
+	*DefaultHandler,
 	error,
 ) {
 	// Check if the config is nil
@@ -38,12 +38,12 @@ func NewDefaultConnHandler(config Config) (
 
 	// Define the Redis options
 	clientOptions := &redis.Options{
-		Addr:     config.URI(),
-		Password: config.Password(),
-		DB:       config.Database(),
+		Addr:     config.URI,
+		Password: config.Password,
+		DB:       config.Database,
 	}
 
-	return &DefaultConnHandler{
+	return &DefaultHandler{
 		clientOptions: clientOptions,
 	}, nil
 }
@@ -54,7 +54,7 @@ func NewDefaultConnHandler(config Config) (
 //
 // - *redis.Client: Redis client
 // - error: error if the connection fails or is already established
-func (d *DefaultConnHandler) Connect() (*redis.Client, error) {
+func (d *DefaultHandler) Connect() (*redis.Client, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilConnHandler
 	}
@@ -89,7 +89,7 @@ func (d *DefaultConnHandler) Connect() (*redis.Client, error) {
 //
 // - *redis.Client: Redis client
 // - error: error if the connection is not established
-func (d *DefaultConnHandler) Client() (*redis.Client, error) {
+func (d *DefaultHandler) Client() (*redis.Client, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilConnHandler
 	}
@@ -111,7 +111,7 @@ func (d *DefaultConnHandler) Client() (*redis.Client, error) {
 // Returns:
 //
 // - error: error if the disconnection fails
-func (d *DefaultConnHandler) Disconnect() error {
+func (d *DefaultHandler) Disconnect() error {
 	if d == nil {
 		return godatabases.ErrNilConnHandler
 	}

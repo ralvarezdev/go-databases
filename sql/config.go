@@ -7,18 +7,18 @@ import (
 )
 
 type (
-	// ConnConfig struct
-	ConnConfig struct {
-		driverName            string
-		dataSourceName        string
-		maxOpenConnections    int
-		maxIdleConnections    int
-		connectionMaxLifetime time.Duration
-		connectionMaxIdleTime time.Duration
+	// Config struct
+	Config struct {
+		DriverName            string
+		DataSourceName        string
+		MaxOpenConnections    int
+		MaxIdleConnections    int
+		ConnectionMaxLifetime time.Duration
+		ConnectionMaxIdleTime time.Duration
 	}
 )
 
-// NewConnConfig creates a new configuration for the connection
+// NewConfig creates a new configuration for the connection
 //
 // Parameters:
 //
@@ -31,16 +31,16 @@ type (
 //
 // Returns:
 //
-//   - *ConnConfig: the connection configuration
+//   - *Config: the connection configuration
 //   - error: if any error occurs
-func NewConnConfig(
+func NewConfig(
 	driverName,
 	dataSourceName string,
 	maxOpenConnections,
 	maxIdleConnections int,
 	connectionMaxIdleTime,
 	connectionMaxLifetime time.Duration,
-) (*ConnConfig, error) {
+) (*Config, error) {
 	// Check if the driver name ir data source name is empty
 	if driverName == "" {
 		return nil, godatabases.ErrEmptyDriverName
@@ -49,7 +49,7 @@ func NewConnConfig(
 		return nil, godatabases.ErrEmptyDataSourceName
 	}
 
-	return &ConnConfig{
+	return &Config{
 		driverName,
 		dataSourceName,
 		maxOpenConnections,
@@ -57,58 +57,4 @@ func NewConnConfig(
 		connectionMaxIdleTime,
 		connectionMaxLifetime,
 	}, nil
-}
-
-// DriverName returns the driver name
-//
-// Returns:
-//
-//   - string: the driver name
-func (c ConnConfig) DriverName() string {
-	return c.driverName
-}
-
-// DataSourceName returns the data source name
-//
-// Returns:
-//
-//   - string: the data source name
-func (c ConnConfig) DataSourceName() string {
-	return c.dataSourceName
-}
-
-// MaxOpenConnections returns the maximum open connections
-//
-// Returns:
-//
-//   - int: the maximum open connections
-func (c ConnConfig) MaxOpenConnections() int {
-	return c.maxOpenConnections
-}
-
-// MaxIdleConnections returns the maximum idle connections
-//
-// Returns:
-//
-//   - int: the maximum idle connections
-func (c ConnConfig) MaxIdleConnections() int {
-	return c.maxIdleConnections
-}
-
-// ConnectionMaxLifetime returns the connection max lifetime
-//
-// Returns:
-//
-//   - time.Duration: the connection max lifetime
-func (c ConnConfig) ConnectionMaxLifetime() time.Duration {
-	return c.connectionMaxLifetime
-}
-
-// ConnectionMaxIdleTime returns the connection max idle time
-//
-// Returns:
-//
-//   - time.Duration: the connection max idle time
-func (c ConnConfig) ConnectionMaxIdleTime() time.Duration {
-	return c.connectionMaxIdleTime
 }

@@ -10,8 +10,8 @@ import (
 )
 
 type (
-	// PoolHandler interface
-	PoolHandler interface {
+	// Handler interface
+	Handler interface {
 		Connect() (*pgxpool.Pool, error)
 		Pool() (*pgxpool.Pool, error)
 		Disconnect()

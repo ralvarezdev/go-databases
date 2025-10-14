@@ -1,22 +1,15 @@
 package redis
 
 type (
-	// Config interface
-	Config interface {
-		URI() string
-		Password() string
-		Database() int
-	}
-
-	// ConnConfig struct
-	ConnConfig struct {
-		uri      string
-		password string
-		database int
+	// Config struct
+	Config struct {
+		URI      string
+		Password string
+		Database int
 	}
 )
 
-// NewConnConfig creates a new Redis config
+// NewConfig creates a new Redis config
 //
 // Parameters:
 //
@@ -26,38 +19,11 @@ type (
 //
 // Returns:
 //
-// *ConnConfig: the Redis config
-func NewConnConfig(uri, password string, database int) *ConnConfig {
-	return &ConnConfig{
+// *Config: the Redis config
+func NewConfig(uri, password string, database int) *Config {
+	return &Config{
 		uri,
 		password,
 		database,
 	}
-}
-
-// URI returns the URI
-//
-// Returns:
-//
-// string: the URI
-func (c ConnConfig) URI() string {
-	return c.uri
-}
-
-// Password returns the password
-//
-// Returns:
-//
-// string: the password
-func (c ConnConfig) Password() string {
-	return c.password
-}
-
-// Database returns the database
-//
-// Returns:
-//
-// int: the database
-func (c ConnConfig) Database() int {
-	return c.database
 }

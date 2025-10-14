@@ -8,15 +8,15 @@ import (
 )
 
 type (
-	// DefaultConnHandler struct
-	DefaultConnHandler struct {
-		config Config
+	// DefaultHandler struct
+	DefaultHandler struct {
+		config *Config
 		db     *sql.DB
 		mutex  sync.Mutex
 	}
 )
 
-// NewDefaultConnHandler creates a new connection
+// NewDefaultHandler creates a new connection
 //
 // Parameters:
 //
@@ -24,16 +24,16 @@ type (
 //
 // Returns:
 //
-//   - *DefaultConnHandler: the connection handler
-func NewDefaultConnHandler(
-	config Config,
-) (*DefaultConnHandler, error) {
+//   - *DefaultHandler: the connection handler
+func NewDefaultHandler(
+	config *Config,
+) (*DefaultHandler, error) {
 	// Check if the configuration is nil
 	if config == nil {
 		return nil, godatabases.ErrNilConfig
 	}
 
-	return &DefaultConnHandler{
+	return &DefaultHandler{
 		config: config,
 	}, nil
 }
@@ -44,7 +44,7 @@ func NewDefaultConnHandler(
 //
 //   - *sql.DB: the SQL connection
 //   - error: if any error occurred
-func (d *DefaultConnHandler) Connect() (*sql.DB, error) {
+func (d *DefaultHandler) Connect() (*sql.DB, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilConnHandler
 	}
@@ -54,22 +54,22 @@ func (d *DefaultConnHandler) Connect() (*sql.DB, error) {
 	defer d.mutex.Unlock()
 
 	// Open a new connection
-	db, err := sql.Open(d.config.DriverName(), d.config.DataSourceName())
+	db, err := sql.Open(d.config.DriverName, d.config.DataSourceName)
 	if err != nil {
 		return nil, err
 	}
 
 	// Set the maximum open connections
-	db.SetMaxOpenConns(d.config.MaxOpenConnections())
+	db.SetMaxOpenConns(d.config.MaxOpenConnections)
 
 	// Set the maximum idle connections
-	db.SetMaxIdleConns(d.config.MaxIdleConnections())
+	db.SetMaxIdleConns(d.config.MaxIdleConnections)
 
 	// Set the connection max lifetime
-	db.SetConnMaxLifetime(d.config.ConnectionMaxLifetime())
+	db.SetConnMaxLifetime(d.config.ConnectionMaxLifetime)
 
 	// Set the connection max idle time
-	db.SetConnMaxIdleTime(d.config.ConnectionMaxIdleTime())
+	db.SetConnMaxIdleTime(d.config.ConnectionMaxIdleTime)
 
 	// Set client
 	d.db = db
@@ -83,7 +83,7 @@ func (d *DefaultConnHandler) Connect() (*sql.DB, error) {
 //
 //   - *sql.DB: the SQL connection
 //   - error: if any error occurred
-func (d *DefaultConnHandler) DB() (*sql.DB, error) {
+func (d *DefaultHandler) DB() (*sql.DB, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilConnHandler
 	}
@@ -104,7 +104,7 @@ func (d *DefaultConnHandler) DB() (*sql.DB, error) {
 // Returns:
 //
 //   - error: if any error occurred
-func (d *DefaultConnHandler) Disconnect() error {
+func (d *DefaultHandler) Disconnect() error {
 	if d == nil {
 		return godatabases.ErrNilConnHandler
 	}

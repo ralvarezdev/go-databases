@@ -2,22 +2,11 @@ package sql
 
 import (
 	"database/sql"
-	"time"
 )
 
 type (
-	// Config interface
-	Config interface {
-		DriverName() string
-		DataSourceName() string
-		MaxOpenConnections() int
-		MaxIdleConnections() int
-		ConnectionMaxLifetime() time.Duration
-		ConnectionMaxIdleTime() time.Duration
-	}
-
-	// ConnHandler interface
-	ConnHandler interface {
+	// Handler interface
+	Handler interface {
 		Connect() (*sql.DB, error)
 		DB() (*sql.DB, error)
 		Disconnect()

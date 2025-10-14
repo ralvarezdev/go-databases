@@ -9,30 +9,38 @@ import (
 )
 
 type (
-	// DefaultPoolHandler struct
-	DefaultPoolHandler struct {
-		config Config
+	// DefaultHandler struct
+	DefaultHandler struct {
+		config *Config
 		pool   *pgxpool.Pool
 		mutex  sync.Mutex
 	}
 )
 
-// NewDefaultPoolHandler creates a new connection
-func NewDefaultPoolHandler(
-	config Config,
-) (*DefaultPoolHandler, error) {
+// NewDefaultHandler creates a new connection
+//
+// Parameters:
+//
+//   - config *Config: configuration for the connection
+//
+// Returns:
+//
+//   - *DefaultHandler: connection handler
+func NewDefaultHandler(
+	config *Config,
+) (*DefaultHandler, error) {
 	// Check if the configuration is nil
 	if config == nil {
 		return nil, godatabases.ErrNilConfig
 	}
 
-	return &DefaultPoolHandler{
+	return &DefaultHandler{
 		config: config,
 	}, nil
 }
 
 // Connect returns a new connection pool
-func (d *DefaultPoolHandler) Connect() (*pgxpool.Pool, error) {
+func (d *DefaultHandler) Connect() (*pgxpool.Pool, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilConnHandler
 	}
@@ -65,7 +73,7 @@ func (d *DefaultPoolHandler) Connect() (*pgxpool.Pool, error) {
 //
 //   - *pgxpool.Pool: the connection pool
 //   - error: if the connection is not established
-func (d *DefaultPoolHandler) Pool() (*pgxpool.Pool, error) {
+func (d *DefaultHandler) Pool() (*pgxpool.Pool, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilPoolHandler
 	}
@@ -83,7 +91,7 @@ func (d *DefaultPoolHandler) Pool() (*pgxpool.Pool, error) {
 }
 
 // Disconnect closes the connection pool
-func (d *DefaultPoolHandler) Disconnect() {
+func (d *DefaultHandler) Disconnect() {
 	if d == nil {
 		return
 	}
