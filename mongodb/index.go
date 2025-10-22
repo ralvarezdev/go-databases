@@ -22,7 +22,7 @@ func NewFieldIndex(name string, order Order) *FieldIndex {
 // NewUniqueIndex creates a new unique field index model
 func NewUniqueIndex(fieldIndex FieldIndex, unique bool) *mongo.IndexModel {
 	return &mongo.IndexModel{
-		Keys:    bson.D{{fieldIndex.name, fieldIndex.order.OrderInt()}},
+		Keys:    bson.D{{Key: fieldIndex.name, Value: fieldIndex.order.OrderInt()}},
 		Options: options.Index().SetUnique(unique),
 	}
 }
@@ -30,7 +30,7 @@ func NewUniqueIndex(fieldIndex FieldIndex, unique bool) *mongo.IndexModel {
 // NewTTLIndex creates a new TTL index model
 func NewTTLIndex(fieldName string, expireAfterSeconds int32) *mongo.IndexModel {
 	return &mongo.IndexModel{
-		Keys:    bson.D{{fieldName, 1}},
+		Keys:    bson.D{{Key: fieldName, Value: 1}},
 		Options: options.Index().SetExpireAfterSeconds(expireAfterSeconds),
 	}
 }

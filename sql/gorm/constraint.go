@@ -1,14 +1,15 @@
 package gorm
 
 import (
-	godatabases "github.com/ralvarezdev/go-databases"
 	"gorm.io/gorm"
+
+	godatabases "github.com/ralvarezdev/go-databases"
 )
 
 type (
 	// ModelConstraints struct
 	ModelConstraints struct {
-		model interface{}
+		model any
 		names []string
 	}
 )
@@ -23,7 +24,7 @@ type (
 // Returns:
 //
 //   - *ModelConstraints: The model constraints
-func NewModelConstraints(model interface{}, names ...string) *ModelConstraints {
+func NewModelConstraints(model any, names ...string) *ModelConstraints {
 	return &ModelConstraints{
 		model,
 		names,
@@ -41,7 +42,7 @@ func NewModelConstraints(model interface{}, names ...string) *ModelConstraints {
 // Returns:
 //
 //   - bool: True if the constraint exists, false otherwise
-func HasConstraint(database *gorm.DB, model interface{}, name string) bool {
+func HasConstraint(database *gorm.DB, model any, name string) bool {
 	// Check if the database or the model is nil
 	if database == nil || model == nil {
 		return false
@@ -67,7 +68,7 @@ func HasConstraint(database *gorm.DB, model interface{}, name string) bool {
 func CreateModelConstraints(
 	database *gorm.DB,
 	modelConstraints *ModelConstraints,
-) (err error) {
+) error {
 	// Check if the database or the constraint is nil
 	if database == nil {
 		return godatabases.ErrNilConnection
@@ -83,7 +84,7 @@ func CreateModelConstraints(
 		}
 
 		// Create the constraint
-		if err = database.Migrator().CreateConstraint(
+		if err := database.Migrator().CreateConstraint(
 			modelConstraints.model,
 			name,
 		); err != nil {

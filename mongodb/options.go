@@ -15,8 +15,8 @@ import (
 //
 //   - *options.FindOneOptions: The prepared find one options
 func PrepareFindOneOptions(
-	projection interface{},
-	sort interface{},
+	projection any,
+	sort any,
 ) *options.FindOneOptions {
 	// Create the find options
 	findOptions := options.FindOne()
@@ -47,8 +47,8 @@ func PrepareFindOneOptions(
 //
 //   - *options.FindOptions: The prepared find options
 func PrepareFindOptions(
-	projection interface{},
-	sort interface{},
+	projection any,
+	sort any,
 	limit int64,
 	skip int64,
 ) *options.FindOptions {
@@ -110,8 +110,8 @@ func PrepareUpdateOptions(upsert bool) *options.UpdateOptions {
 //
 //   - *options.FindOneAndUpdateOptions: The prepared find one and update options
 func PrepareFindOneAndUpdateOptions(
-	projection interface{},
-	sort interface{},
+	projection any,
+	sort any,
 	upsert bool,
 	returnDocument options.ReturnDocument,
 ) *options.FindOneAndUpdateOptions {

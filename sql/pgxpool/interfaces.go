@@ -21,32 +21,28 @@ type (
 	// Service is the interface for the service
 	Service interface {
 		Pool() *pgxpool.Pool
-		Migrate(queries ...string) error
-		CreateTransaction(fn TransactionWithCtxFn) error
-		CreateTransactionWithCtx(
-			ctx context.Context,
-			fn TransactionWithCtxFn,
-		) error
-		Exec(query *string, params ...interface{}) (*pgconn.CommandTag, error)
+		CreateTransaction(fn TransactionFn) error
+		Exec(query *string, params ...any) (*pgconn.CommandTag, error)
 		ExecWithCtx(
 			ctx context.Context,
 			query *string,
-			params ...interface{},
+			params ...any,
 		) (*pgconn.CommandTag, error)
-		Query(query *string, params ...interface{}) (pgx.Rows, error)
+		Query(query *string, params ...any) (pgx.Rows, error)
 		QueryWithCtx(
 			ctx context.Context,
 			query *string,
-			params ...interface{},
+			params ...any,
 		) (pgx.Rows, error)
-		QueryRow(query *string, params ...interface{}) (pgx.Row, error)
+		QueryRow(query *string, params ...any) (pgx.Row, error)
 		QueryRowWithCtx(
 			ctx context.Context,
 			query *string,
-			params ...interface{},
+			params ...any,
 		) (pgx.Row, error)
-		ScanRow(row pgx.Row, destinations ...interface{}) error
+		ScanRow(row pgx.Row, destinations ...any) error
 		SetStatTicker(
+			ctx context.Context,
 			duration time.Duration,
 			fn func(*pgxpool.Stat),
 		)

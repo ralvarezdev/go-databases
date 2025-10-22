@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
 
 	godatabases "github.com/ralvarezdev/go-databases"
@@ -15,20 +16,27 @@ type (
 //
 // Parameters:
 //
+//   - ctx: The context for the transaction
 //   - db: The database connection
 //   - fn: The function to execute within the transaction
+//   - opts: The transaction options
 //
 // Returns:
 //
 //   - error: An error if the transaction fails
-func CreateTransaction(db *sql.DB, fn TransactionFn) error {
+func CreateTransaction(
+	ctx context.Context,
+	db *sql.DB,
+	fn TransactionFn,
+	opts *sql.TxOptions,
+) error {
 	// Check if the connection is nil
 	if db == nil {
 		return godatabases.ErrNilConnection
 	}
 
 	// Start a transaction
-	tx, err := db.Begin()
+	tx, err := db.BeginTx(ctx, opts)
 	if err != nil {
 		return err
 	}

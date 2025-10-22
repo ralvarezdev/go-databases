@@ -4,8 +4,9 @@ import (
 	"sync"
 
 	"github.com/go-redis/redis/v8"
-	godatabases "github.com/ralvarezdev/go-databases"
 	"golang.org/x/net/context"
+
+	godatabases "github.com/ralvarezdev/go-databases"
 )
 
 type (

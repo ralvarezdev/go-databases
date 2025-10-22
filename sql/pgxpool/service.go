@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	godatabases "github.com/ralvarezdev/go-databases"
 )
 
@@ -54,58 +55,7 @@ func (d *DefaultService) Pool() *pgxpool.Pool {
 	return d.pool
 }
 
-// Migrate migrates the database
-//
-// Parameters:
-//
-//   - queries: the SQL queries to execute
-//
-// Returns:
-//
-//   - error: if any error occurs
-func (d *DefaultService) Migrate(queries ...string) error {
-	if d == nil {
-		return godatabases.ErrNilService
-	}
-
-	// Check if there are no queries
-	if len(queries) == 0 {
-		return nil
-	}
-
-	// Create a new transaction
-	return d.CreateTransaction(
-		func(ctx context.Context, tx pgx.Tx) error {
-			// Execute the migration
-			for _, query := range queries {
-				if _, err := tx.Exec(context.Background(), query); err != nil {
-					return err
-				}
-			}
-			return nil
-		},
-	)
-}
-
-// CreateTransaction creates a transaction for the database
-//
-// Parameters:
-//
-//   - fn: the function to execute within the transaction
-//
-// Returns:
-//
-//   - error: if any error occurs
-func (d *DefaultService) CreateTransaction(
-	fn TransactionWithCtxFn,
-) error {
-	if d == nil {
-		return godatabases.ErrNilService
-	}
-	return CreateTransaction(d.pool, fn)
-}
-
-// CreateTransactionWithCtx creates a transaction for the database with a context
+// CreateTransaction creates a transaction for the database with a context
 //
 // Parameters:
 //
@@ -115,14 +65,14 @@ func (d *DefaultService) CreateTransaction(
 // Returns:
 //
 //   - error: if any error occurs
-func (d *DefaultService) CreateTransactionWithCtx(
+func (d *DefaultService) CreateTransaction(
 	ctx context.Context,
-	fn TransactionWithCtxFn,
+	fn TransactionFn,
 ) error {
 	if d == nil {
 		return godatabases.ErrNilService
 	}
-	return CreateTransactionWithCtx(ctx, d.pool, fn)
+	return CreateTransaction(ctx, d.pool, fn)
 }
 
 // ExecWithCtx executes a query with parameters and returns the result with a context
@@ -140,7 +90,7 @@ func (d *DefaultService) CreateTransactionWithCtx(
 func (d *DefaultService) ExecWithCtx(
 	ctx context.Context,
 	query *string,
-	params ...interface{},
+	params ...any,
 ) (
 	*pgconn.CommandTag,
 	error,
@@ -173,7 +123,7 @@ func (d *DefaultService) ExecWithCtx(
 //
 //   - *pgconn.CommandTag: the command tag result
 //   - error: if any error occurs
-func (d *DefaultService) Exec(query *string, params ...interface{}) (
+func (d *DefaultService) Exec(query *string, params ...any) (
 	*pgconn.CommandTag,
 	error,
 ) {
@@ -197,7 +147,7 @@ func (d *DefaultService) Exec(query *string, params ...interface{}) (
 func (d *DefaultService) QueryWithCtx(
 	ctx context.Context,
 	query *string,
-	params ...interface{},
+	params ...any,
 ) (pgx.Rows, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilService
@@ -225,7 +175,7 @@ func (d *DefaultService) QueryWithCtx(
 //   - error: if any error occurs
 func (d *DefaultService) Query(
 	query *string,
-	params ...interface{},
+	params ...any,
 ) (pgx.Rows, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilService
@@ -248,7 +198,7 @@ func (d *DefaultService) Query(
 func (d *DefaultService) QueryRowWithCtx(
 	ctx context.Context,
 	query *string,
-	params ...interface{},
+	params ...any,
 ) (pgx.Row, error) {
 	if d == nil {
 		return nil, godatabases.ErrNilService
@@ -276,7 +226,7 @@ func (d *DefaultService) QueryRowWithCtx(
 //   - error: if any error occurs
 func (d *DefaultService) QueryRow(
 	query *string,
-	params ...interface{},
+	params ...any,
 ) (pgx.Row, error) {
 	return d.QueryRowWithCtx(context.Background(), query, params...)
 }
@@ -293,7 +243,7 @@ func (d *DefaultService) QueryRow(
 // - error: if any error occurs
 func (d *DefaultService) ScanRow(
 	row pgx.Row,
-	destinations ...interface{},
+	destinations ...any,
 ) error {
 	if d == nil {
 		return godatabases.ErrNilService
@@ -312,9 +262,11 @@ func (d *DefaultService) ScanRow(
 //
 // Parameters:
 //
+//   - ctx: the context to use
 //   - duration: the duration of the ticker
 //   - fn: the function to execute on each tick, receiving the pgxpool.Stat
 func (d *DefaultService) SetStatTicker(
+	ctx context.Context,
 	duration time.Duration,
 	fn func(*pgxpool.Stat),
 ) {
@@ -334,6 +286,8 @@ func (d *DefaultService) SetStatTicker(
 	go func() {
 		for {
 			select {
+			case <-ctx.Done():
+				return // Exit the goroutine when the context is done
 			case <-d.statTicker.C:
 				fn(d.pool.Stat())
 			}

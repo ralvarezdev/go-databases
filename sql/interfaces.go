@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
 )
 
@@ -16,10 +17,23 @@ type (
 	// Service is the interface for the service
 	Service interface {
 		DB() *sql.DB
-		Migrate(queries ...string) error
-		CreateTransaction(fn TransactionFn) error
-		Exec(query *string, params ...interface{}) (sql.Result, error)
-		QueryRow(query *string, params ...interface{}) *sql.Row
-		ScanRow(row *sql.Row, destinations ...interface{}) error
+		CreateTransaction(
+			ctx context.Context,
+			fn TransactionFn,
+			opts *sql.TxOptions,
+		) error
+		Exec(query *string, params ...any) (sql.Result, error)
+		ExecWithCtx(
+			ctx any,
+			query *string,
+			params ...any,
+		) (sql.Result, error)
+		QueryRow(query *string, params ...any) *sql.Row
+		QueryRowWithCtx(
+			ctx any,
+			query *string,
+			params ...any,
+		) *sql.Row
+		ScanRow(row *sql.Row, destinations ...any) error
 	}
 )

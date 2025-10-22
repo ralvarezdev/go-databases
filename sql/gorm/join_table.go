@@ -1,16 +1,17 @@
 package gorm
 
 import (
-	godatabases "github.com/ralvarezdev/go-databases"
 	"gorm.io/gorm"
+
+	godatabases "github.com/ralvarezdev/go-databases"
 )
 
 type (
 	// JoinField struct
 	JoinField struct {
-		model     interface{}
+		model     any
 		field     string
-		joinTable interface{}
+		joinTable any
 	}
 )
 
@@ -26,9 +27,9 @@ type (
 //
 //   - *JoinField: the join field
 func NewJoinField(
-	model interface{},
+	model any,
 	field string,
-	joinTable interface{},
+	joinTable any,
 ) *JoinField {
 	return &JoinField{
 		model:     model,
@@ -79,9 +80,9 @@ func SetupJoinTable(
 func SetupJoinTables(
 	database *gorm.DB,
 	joinFields []*JoinField,
-) (err error) {
+) error {
 	for _, joinField := range joinFields {
-		if err = SetupJoinTable(database, joinField); err != nil {
+		if err := SetupJoinTable(database, joinField); err != nil {
 			return err
 		}
 	}

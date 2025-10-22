@@ -47,8 +47,8 @@ func (c Collection) CreateCollection(database *mongo.Database) (
 	collection = database.Collection(c.name)
 
 	// Create the indexes
-	if err = c.createIndexes(collection); err != nil {
-		return nil, err
+	if createErr := c.createIndexes(collection); createErr != nil {
+		return nil, createErr
 	}
 
 	return collection, nil

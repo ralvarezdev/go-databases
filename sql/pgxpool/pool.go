@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	godatabases "github.com/ralvarezdev/go-databases"
 )
 

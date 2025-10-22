@@ -5,15 +5,16 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	godatabases "github.com/ralvarezdev/go-databases"
 )
 
 type (
-	// TransactionWithCtxFn is the function type for transactions with context
-	TransactionWithCtxFn func(ctx context.Context, tx pgx.Tx) error
+	// TransactionFn is the function type for transactions with context
+	TransactionFn func(ctx context.Context, tx pgx.Tx) error
 )
 
-// CreateTransactionWithCtx creates a transaction for the database with context
+// CreateTransaction creates a transaction for the database with context
 //
 // Parameters:
 //
@@ -24,10 +25,10 @@ type (
 // Returns:
 //
 //   - error: An error if the transaction fails, otherwise nil
-func CreateTransactionWithCtx(
+func CreateTransaction(
 	ctx context.Context,
 	pool *pgxpool.Pool,
-	fn TransactionWithCtxFn,
+	fn TransactionFn,
 ) error {
 	// Check if the pool is nil
 	if pool == nil {
@@ -51,21 +52,4 @@ func CreateTransactionWithCtx(
 
 	// Commit the transaction
 	return tx.Commit(ctx)
-}
-
-// CreateTransaction creates a transaction for the database
-//
-// Parameters:
-//
-//   - pool: The pgxpool.Pool instance
-//   - fn: The function to execute within the transaction
-//
-// Returns:
-//
-//   - error: An error if the transaction fails, otherwise nil
-func CreateTransaction(
-	pool *pgxpool.Pool,
-	fn TransactionWithCtxFn,
-) error {
-	return CreateTransactionWithCtx(context.Background(), pool, fn)
 }

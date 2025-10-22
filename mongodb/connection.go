@@ -3,10 +3,11 @@ package mongodb
 import (
 	"sync"
 
-	godatabases "github.com/ralvarezdev/go-databases"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
+
+	godatabases "github.com/ralvarezdev/go-databases"
 )
 
 type (

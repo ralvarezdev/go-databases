@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
 
 	godatabases "github.com/ralvarezdev/go-databases"
@@ -49,76 +50,144 @@ func (d *DefaultService) DB() *sql.DB {
 	return d.db
 }
 
-// Migrate migrates the database
+// CreateTransaction creates a transaction for the database
 //
 // Parameters:
 //
-// *queries ...string: the queries to migrate
+// - ctx: The context for the transaction
+// - fn: The function to execute within the transaction
+// - opts: The transaction options
 //
 // Returns:
 //
-// error: if there was an error migrating the database
-func (d *DefaultService) Migrate(queries ...string) error {
+// - error: An error if the transaction fails
+func (d *DefaultService) CreateTransaction(
+	ctx context.Context,
+	fn TransactionFn,
+	opts *sql.TxOptions,
+) error {
 	if d == nil {
 		return godatabases.ErrNilService
 	}
-
-	// Check if there are no queries
-	if len(queries) == 0 {
-		return nil
-	}
-
-	// Create a new transaction
-	return d.CreateTransaction(
-		func(tx *sql.Tx) error {
-			// Execute the migration
-			for _, query := range queries {
-				if _, err := tx.Exec(query); err != nil {
-					return err
-				}
-			}
-			return nil
-		},
-	)
-}
-
-// CreateTransaction creates a transaction for the database
-func (d *DefaultService) CreateTransaction(fn TransactionFn) error {
-	return CreateTransaction(d.db, fn)
+	return CreateTransaction(ctx, d.db, fn, opts)
 }
 
 // Exec executes a query with parameters and returns the result
-func (d *DefaultService) Exec(query *string, params ...interface{}) (
+//
+// Parameters:
+//
+//   - query: the query to execute
+//
+// - params: the parameters for the query
+//
+// Returns:
+//
+//   - sql.Result: the result of the execution
+func (d *DefaultService) Exec(query *string, params ...any) (
 	sql.Result,
 	error,
 ) {
+	if d == nil {
+		return nil, godatabases.ErrNilService
+	}
+	return d.ExecWithCtx(context.Background(), query, params...)
+}
+
+// ExecWithCtx executes a query with parameters and returns the result with a context
+//
+// Parameters:
+//
+// - ctx: the context to use
+// - query: the query to execute
+// - params: the parameters for the query
+//
+// Returns:
+//
+// - sql.Result: the result of the execution
+// - error: if any error occurs
+func (d *DefaultService) ExecWithCtx(
+	ctx context.Context,
+	query *string,
+	params ...any,
+) (
+	sql.Result,
+	error,
+) {
+	if d == nil {
+		return nil, godatabases.ErrNilService
+	}
+
 	// Check if the query is nil
 	if query == nil {
 		return nil, godatabases.ErrNilQuery
 	}
 
 	// Run the exec
-	return d.db.Exec(*query, params...)
+	return d.db.ExecContext(ctx, *query, params...)
 }
 
 // QueryRow runs a query row with parameters and returns the result row
+//
+// Parameters:
+//
+// - query: the query to execute
+// - params: the parameters for the query
+//
+// Returns:
+//
+// - *sql.Row: the result row
 func (d *DefaultService) QueryRow(
 	query *string,
-	params ...interface{},
+	params ...any,
 ) *sql.Row {
+	if d == nil {
+		return nil
+	}
+	return d.QueryRowWithCtx(context.Background(), query, params...)
+}
+
+// QueryRowWithCtx runs a query row with parameters and returns the result row with a context
+//
+// Parameters:
+//
+// - ctx: the context to use
+// - query: the query to execute
+// - params: the parameters for the query
+//
+// Returns:
+//
+// - *sql.Row: the result row
+func (d *DefaultService) QueryRowWithCtx(
+	ctx context.Context,
+	query *string,
+	params ...any,
+) *sql.Row {
+	if d == nil {
+		return nil
+	}
+
 	// Check if the query is nil
 	if query == nil {
 		return nil
 	}
 
 	// Run the query row
-	return d.db.QueryRow(*query, params...)
+	return d.db.QueryRowContext(ctx, *query, params...)
 }
 
 // ScanRow scans a row
+//
+// Parameters:
+//
+// - row: the row to scan
+// - destinations: the destinations to scan into
+//
+// Returns:
+//
+// - error: if any error occurs
 func (d *DefaultService) ScanRow(
 	row *sql.Row,
-	destinations ...interface{},
+	destinations ...any,
 ) error {
 	// Check if the row is nil
 	if row == nil {

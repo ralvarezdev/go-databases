@@ -1,4 +1,4 @@
-package go_databases
+package godatabases
 
 import "errors"
 
