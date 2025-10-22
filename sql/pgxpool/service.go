@@ -2,6 +2,7 @@ package pgxpool
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -14,8 +15,9 @@ import (
 type (
 	// DefaultService is the default service struct
 	DefaultService struct {
-		pool       *pgxpool.Pool
+		Handler
 		statTicker *time.Ticker
+		logger     *slog.Logger
 	}
 )
 
@@ -23,36 +25,31 @@ type (
 //
 // Parameters:
 //
-//   - pool: the pgxpool.Pool instance
+//   - config *Config: configuration for the connection
+//   - logger *slog.Logger: the logger instance
 //
 // Returns:
 //
 //   - *DefaultService: the DefaultService instance
 //   - error: if any error occurs
-func NewDefaultService(pool *pgxpool.Pool) (
+func NewDefaultService(config *Config, logger *slog.Logger) (
 	instance *DefaultService,
 	err error,
 ) {
-	// Check if the pool is nil
-	if pool == nil {
-		return nil, godatabases.ErrNilPool
+	// Create the handler
+	handler, err := NewDefaultHandler(config)
+	if err != nil {
+		return nil, err
+	}
+
+	if logger != nil {
+		logger = logger.With(slog.String("database", "pgxpool"), slog.String("service", "DefaultService"))
 	}
 
 	return &DefaultService{
-		pool: pool,
+		Handler: handler,
+		logger:  logger,
 	}, nil
-}
-
-// Pool returns the pool
-//
-// Returns:
-//
-//   - *pgxpool.Pool: the pgxpool.Pool instance
-func (d *DefaultService) Pool() *pgxpool.Pool {
-	if d == nil {
-		return nil
-	}
-	return d.pool
 }
 
 // CreateTransaction creates a transaction for the database with a context
@@ -72,7 +69,15 @@ func (d *DefaultService) CreateTransaction(
 	if d == nil {
 		return godatabases.ErrNilService
 	}
-	return CreateTransaction(ctx, d.pool, fn)
+
+	// Get the pool
+	pool, err := d.Pool()
+	if err != nil {
+		return err
+	}
+
+	// Create the transaction
+	return CreateTransaction(ctx, pool, fn)
 }
 
 // ExecWithCtx executes a query with parameters and returns the result with a context
@@ -104,8 +109,14 @@ func (d *DefaultService) ExecWithCtx(
 		return nil, godatabases.ErrNilQuery
 	}
 
+	// Get the pool
+	pool, err := d.Pool()
+	if err != nil {
+		return nil, err
+	}
+
 	// Run the exec
-	commandTag, err := d.pool.Exec(ctx, *query, params...)
+	commandTag, err := pool.Exec(ctx, *query, params...)
 	if err != nil {
 		return nil, err
 	}
@@ -158,8 +169,14 @@ func (d *DefaultService) QueryWithCtx(
 		return nil, godatabases.ErrNilQuery
 	}
 
+	// Get the pool
+	pool, err := d.Pool()
+	if err != nil {
+		return nil, err
+	}
+
 	// Run the query
-	return d.pool.Query(ctx, *query, params...)
+	return pool.Query(ctx, *query, params...)
 }
 
 // Query runs a query with parameters and returns the result
@@ -209,8 +226,14 @@ func (d *DefaultService) QueryRowWithCtx(
 		return nil, godatabases.ErrNilQuery
 	}
 
+	// Get the pool
+	pool, err := d.Pool()
+	if err != nil {
+		return nil, err
+	}
+
 	// Run the query row
-	return d.pool.QueryRow(ctx, *query, params...), nil
+	return pool.QueryRow(ctx, *query, params...), nil
 }
 
 // QueryRow runs a query row with parameters and returns the result row
@@ -289,7 +312,14 @@ func (d *DefaultService) SetStatTicker(
 			case <-ctx.Done():
 				return // Exit the goroutine when the context is done
 			case <-d.statTicker.C:
-				fn(d.pool.Stat())
+				// Get the pool
+				pool, err := d.Pool()
+				if err != nil {
+					d.logger.Error("Failed to get pool for stat ticker", slog.String("error", err.Error()))
+					return
+				}
+
+				fn(pool.Stat())
 			}
 		}
 	}()

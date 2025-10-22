@@ -16,7 +16,7 @@ type (
 
 	// Service is the interface for the service
 	Service interface {
-		DB() *sql.DB
+		Handler
 		CreateTransaction(
 			ctx context.Context,
 			fn TransactionFn,
@@ -28,12 +28,12 @@ type (
 			query *string,
 			params ...any,
 		) (sql.Result, error)
-		QueryRow(query *string, params ...any) *sql.Row
+		QueryRow(query *string, params ...any) (*sql.Row, error)
 		QueryRowWithCtx(
 			ctx any,
 			query *string,
 			params ...any,
-		) *sql.Row
+		) (*sql.Row, error)
 		ScanRow(row *sql.Row, destinations ...any) error
 	}
 )

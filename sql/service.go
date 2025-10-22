@@ -10,7 +10,7 @@ import (
 type (
 	// DefaultService is the default service struct
 	DefaultService struct {
-		db *sql.DB
+		Handler
 	}
 )
 
@@ -18,36 +18,25 @@ type (
 //
 // Parameters:
 //
-// *db *sql.DB: the database connection
+//   - config: the configuration for the connection
 //
 // Returns:
 //
 // *DefaultService: the default service
 // error: if there was an error creating the service
-func NewDefaultService(db *sql.DB) (
+func NewDefaultService(config *Config) (
 	instance *DefaultService,
 	err error,
 ) {
-	// Check if the connection is nil
-	if db == nil {
-		return nil, godatabases.ErrNilConnection
+	// Create the handler
+	handler, err := NewDefaultHandler(config)
+	if err != nil {
+		return nil, err
 	}
 
 	return &DefaultService{
-		db,
+		Handler: handler,
 	}, nil
-}
-
-// DB returns the database
-//
-// Returns:
-//
-// *sql.DB: the database
-func (d *DefaultService) DB() *sql.DB {
-	if d == nil {
-		return nil
-	}
-	return d.db
 }
 
 // CreateTransaction creates a transaction for the database
@@ -69,7 +58,15 @@ func (d *DefaultService) CreateTransaction(
 	if d == nil {
 		return godatabases.ErrNilService
 	}
-	return CreateTransaction(ctx, d.db, fn, opts)
+
+	// Get the database connection
+	db, err := d.DB()
+	if err != nil {
+		return err
+	}
+
+	// Create the transaction
+	return CreateTransaction(ctx, db, fn, opts)
 }
 
 // Exec executes a query with parameters and returns the result
@@ -122,8 +119,14 @@ func (d *DefaultService) ExecWithCtx(
 		return nil, godatabases.ErrNilQuery
 	}
 
+	// Get the database connection
+	db, err := d.DB()
+	if err != nil {
+		return nil, err
+	}
+
 	// Run the exec
-	return d.db.ExecContext(ctx, *query, params...)
+	return db.ExecContext(ctx, *query, params...)
 }
 
 // QueryRow runs a query row with parameters and returns the result row
@@ -136,12 +139,13 @@ func (d *DefaultService) ExecWithCtx(
 // Returns:
 //
 // - *sql.Row: the result row
+// - error: if any error occurs
 func (d *DefaultService) QueryRow(
 	query *string,
 	params ...any,
-) *sql.Row {
+) (*sql.Row, error) {
 	if d == nil {
-		return nil
+		return nil, godatabases.ErrNilService
 	}
 	return d.QueryRowWithCtx(context.Background(), query, params...)
 }
@@ -157,22 +161,29 @@ func (d *DefaultService) QueryRow(
 // Returns:
 //
 // - *sql.Row: the result row
+// - error: if any error occurs
 func (d *DefaultService) QueryRowWithCtx(
 	ctx context.Context,
 	query *string,
 	params ...any,
-) *sql.Row {
+) (*sql.Row, error) {
 	if d == nil {
-		return nil
+		return nil, godatabases.ErrNilService
 	}
 
 	// Check if the query is nil
 	if query == nil {
-		return nil
+		return nil, godatabases.ErrNilQuery
+	}
+
+	// Get the database connection
+	db, err := d.DB()
+	if err != nil {
+		return nil, err
 	}
 
 	// Run the query row
-	return d.db.QueryRowContext(ctx, *query, params...)
+	return db.QueryRowContext(ctx, *query, params...), nil
 }
 
 // ScanRow scans a row

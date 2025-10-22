@@ -20,7 +20,7 @@ type (
 
 	// Service is the interface for the service
 	Service interface {
-		Pool() *pgxpool.Pool
+		Handler
 		CreateTransaction(fn TransactionFn) error
 		Exec(query *string, params ...any) (*pgconn.CommandTag, error)
 		ExecWithCtx(
