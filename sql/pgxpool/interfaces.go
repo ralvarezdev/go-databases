@@ -21,7 +21,7 @@ type (
 	// Service is the interface for the service
 	Service interface {
 		Handler
-		CreateTransaction(fn TransactionFn) error
+		CreateTransaction(ctx context.Context, fn TransactionFn) error
 		Exec(query *string, params ...any) (*pgconn.CommandTag, error)
 		ExecWithCtx(
 			ctx context.Context,
