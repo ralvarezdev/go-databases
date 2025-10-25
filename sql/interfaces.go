@@ -24,13 +24,13 @@ type (
 		) error
 		Exec(query *string, params ...any) (sql.Result, error)
 		ExecWithCtx(
-			ctx any,
+			ctx context.Context,
 			query *string,
 			params ...any,
 		) (sql.Result, error)
 		QueryRow(query *string, params ...any) (*sql.Row, error)
 		QueryRowWithCtx(
-			ctx any,
+			ctx context.Context,
 			query *string,
 			params ...any,
 		) (*sql.Row, error)
