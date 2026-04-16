@@ -1,9 +1,9 @@
 module github.com/ralvarezdev/go-databases
 
-go 1.24.0
+go 1.25.0
 
 require (
-	github.com/jackc/pgx/v5 v5.7.6
+	github.com/jackc/pgx/v5 v5.9.0
 	go.mongodb.org/mongo-driver v1.17.4
 	golang.org/x/net v0.47.0
 	gorm.io/gorm v1.31.0
